@@ -109,13 +109,13 @@ export function calculateInvestmentGrowth(
   for (let year = 0; year <= timeHorizonYears; year++) {
     const months = year * 12;
 
-    const nominalValue = calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType);
-    const realValue = calculateTotalFv(currentSavings, monthlySavings, monthlyRealRate, months, annuityType);
+    const nominalValue = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType));
+    const realValue = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyRealRate, months, annuityType));
     
     // Scenario calculations
-    const noInvestment = currentSavings + (monthlySavings * months);
-    const conservative = calculateTotalFv(currentSavings, monthlySavings, monthlyConservativeRate, months, annuityType);
-    const aggressive = calculateTotalFv(currentSavings, monthlySavings, monthlyAggressiveRate, months, annuityType);
+    const noInvestment = Math.round(currentSavings + (monthlySavings * months));
+    const conservative = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyConservativeRate, months, annuityType));
+    const aggressive = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyAggressiveRate, months, annuityType));
 
     chartData.push({ year, nominalValue, realValue, noInvestment, conservative, aggressive });
   }
