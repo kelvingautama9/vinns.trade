@@ -22,6 +22,7 @@ import { cn, formatRupiah, parseRupiah } from '@/lib/utils';
 const formSchema = z.object({
   currentSavings: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
   monthlySavings: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
+  targetAmount: z.string().refine(val => parseRupiah(val) > 0, {message: "Must be a positive number"}),
   expectedReturnRate: z.coerce.number().min(0).max(100),
   inflationRate: z.coerce.number().min(0).max(100),
   timeHorizonYears: z.coerce.number().min(1).max(100),
@@ -39,6 +40,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
     defaultValues: {
       currentSavings: 'Rp 10,000,000',
       monthlySavings: 'Rp 1,000,000',
+      targetAmount: 'Rp 1,000,000,000',
       expectedReturnRate: 8,
       inflationRate: 5,
       timeHorizonYears: 10,
@@ -51,10 +53,11 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
         ...values,
         currentSavings: parseRupiah(values.currentSavings),
         monthlySavings: parseRupiah(values.monthlySavings),
+        targetAmount: parseRupiah(values.targetAmount),
     });
   }
 
-  const handleRupiahChange = (field: "currentSavings" | "monthlySavings") => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRupiahChange = (field: "currentSavings" | "monthlySavings" | "targetAmount") => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const numberValue = parseRupiah(value);
     form.setValue(field, formatRupiah(numberValue));
@@ -62,33 +65,46 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-        <FormField
-            control={form.control}
-            name="currentSavings"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Current Savings</FormLabel>
-                <FormControl>
-                    <Input {...field} onChange={handleRupiahChange("currentSavings")} onBlur={field.onBlur}/>
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
+            <FormField
+                control={form.control}
+                name="currentSavings"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Current Savings</FormLabel>
+                    <FormControl>
+                        <Input {...field} onChange={handleRupiahChange("currentSavings")} onBlur={field.onBlur}/>
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
             />
-        <FormField
-            control={form.control}
-            name="monthlySavings"
-            render={({ field }) => (
-                <FormItem>
-                <FormLabel>Monthly Savings</FormLabel>
-                <FormControl>
-                    <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={field.onBlur} />
-                </FormControl>
-                <FormMessage />
-                </FormItem>
-            )}
+            <FormField
+                control={form.control}
+                name="monthlySavings"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Monthly Savings</FormLabel>
+                    <FormControl>
+                        <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={field.onBlur} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="targetAmount"
+                render={({ field }) => (
+                    <FormItem>
+                    <FormLabel>Financial Goal (Target)</FormLabel>
+                    <FormControl>
+                        <Input {...field} onChange={handleRupiahChange("targetAmount")} onBlur={field.onBlur} />
+                    </FormControl>
+                    <FormMessage />
+                    </FormItem>
+                )}
             />
 
           <FormField
@@ -101,7 +117,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                   <FormControl>
                     <Slider
                       min={0}
-                      max={100}
+                      max={30}
                       step={0.5}
                       value={[field.value]}
                       onValueChange={(value) => field.onChange(value[0])}
@@ -113,7 +129,8 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     {...field}
                     className="w-20 text-center"
                     min={0}
-                    max={100}
+                    max={30}
+                    step={0.5}
                   />
                 </div>
                 <FormMessage />
@@ -131,7 +148,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                   <FormControl>
                     <Slider
                       min={0}
-                      max={100}
+                      max={20}
                       step={0.5}
                       value={[field.value]}
                       onValueChange={(value) => field.onChange(value[0])}
@@ -143,7 +160,8 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     {...field}
                     className="w-20 text-center"
                     min={0}
-                    max={100}
+                    max={20}
+                    step={0.5}
                   />
                 </div>
                 <FormMessage />

@@ -15,11 +15,28 @@ import { formatRupiah } from '@/lib/utils';
 
 type GrowthChartProps = {
   data: ChartDataPoint[];
+  visibleLines: Record<string, boolean>;
 };
 
-export function GrowthChart({ data }: GrowthChartProps) {
+const lineColors = {
+    nominalValue: 'hsl(var(--chart-1))',
+    realValue: 'hsl(var(--chart-2))',
+    noInvestment: 'hsl(var(--chart-3))',
+    conservative: 'hsl(var(--chart-4))',
+    aggressive: 'hsl(var(--chart-5))',
+}
+
+const lineNames: Record<string, string> = {
+    nominalValue: 'Your Projection (Nominal)',
+    realValue: 'Your Projection (Real)',
+    noInvestment: 'No Investment',
+    conservative: 'Conservative Strategy (6%)',
+    aggressive: 'Aggressive Strategy (20%)',
+}
+
+export function GrowthChart({ data, visibleLines }: GrowthChartProps) {
   return (
-    <div className="h-[350px] w-full">
+    <div className="h-[400px] w-full">
       <ResponsiveContainer>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -28,6 +45,7 @@ export function GrowthChart({ data }: GrowthChartProps) {
             stroke="hsl(var(--muted-foreground))"
             tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
             tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
+            label={{ value: "Year", position: "insideBottom", dy: 10, fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
           />
           <YAxis
             stroke="hsl(var(--muted-foreground))"
@@ -36,8 +54,8 @@ export function GrowthChart({ data }: GrowthChartProps) {
             tickFormatter={(value) => {
               if (typeof value !== 'number') return '';
               if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-              if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-              if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+              if (value >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
+              if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
               return value.toString();
             }}
           />
@@ -47,25 +65,23 @@ export function GrowthChart({ data }: GrowthChartProps) {
               borderColor: 'hsl(var(--border))',
               borderRadius: 'var(--radius)',
             }}
-            formatter={(value, name) => [formatRupiah(value as number), name]}
+            formatter={(value, name) => [formatRupiah(value as number), lineNames[name as string] || name]}
           />
           <Legend wrapperStyle={{ fontSize: '14px' }} />
-          <Line
-            type="monotone"
-            dataKey="nominalValue"
-            name="Nominal Growth"
-            stroke="hsl(var(--chart-1))"
-            strokeWidth={2}
-            dot={false}
-          />
-          <Line
-            type="monotone"
-            dataKey="realValue"
-            name="Real Growth (Inflation Adjusted)"
-            stroke="hsl(var(--chart-2))"
-            strokeWidth={2}
-            dot={false}
-          />
+          {Object.entries(visibleLines).map(([key, visible]) => (
+            visible && (
+                <Line
+                    key={key}
+                    type="monotone"
+                    dataKey={key}
+                    name={lineNames[key] || key}
+                    stroke={lineColors[key as keyof typeof lineColors] || '#8884d8'}
+                    strokeWidth={key === 'nominalValue' || key === 'realValue' ? 2.5 : 2}
+                    dot={false}
+                    strokeDasharray={key !== 'nominalValue' && key !== 'realValue' ? "5 5" : "0"}
+                />
+            )
+          ))}
         </LineChart>
       </ResponsiveContainer>
     </div>
