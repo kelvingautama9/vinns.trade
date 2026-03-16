@@ -148,7 +148,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
           <AccordionTrigger className="hover:no-underline">
             <div className="flex items-center gap-2 text-base font-semibold">
               <Info className="h-5 w-5 text-primary" />
-              <span>Understanding Nominal vs. Real Value</span>
+              <span>Memahami Proyeksi dan Skenario</span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="pt-2">
@@ -170,6 +170,40 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                     <p>
                         <strong>Mengapa ini Penting:</strong> Inilah ukuran kekayaan Anda yang paling jujur. Garis ini menunjukkan apakah investasi Anda benar-benar tumbuh lebih cepat daripada kenaikan harga-harga. Jika garis Nilai Riil menanjak, berarti kekayaan Anda secara efektif bertambah.
                     </p>
+                </div>
+                <div>
+                    <h4 className="mb-1 font-semibold text-foreground">Skenario Tanpa Investasi (Garis "No Investment")</h4>
+                    <p>
+                        <strong>Apa itu:</strong> Garis ini menunjukkan total uang yang akan Anda miliki jika Anda hanya menabung di rekening biasa (misalnya di bawah kasur atau rekening bank tanpa bunga) tanpa diinvestasikan sama sekali.
+                    </p>
+                    <p>
+                         <strong>Mengapa ini Penting:</strong> Ini adalah titik acuan Anda. Garis ini dengan jelas menunjukkan biaya peluang (opportunity cost) jika Anda tidak berinvestasi. Selisih antara garis ini dan garis proyeksi Anda adalah keuntungan dari kekuatan compounding.
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="mb-1 font-semibold text-foreground">Skenario Konservatif (Garis "Conservative")</h4>
+                    <p>
+                        <strong>Apa itu:</strong> Skenario ini memproyeksikan hasil dengan return tahunan yang lebih rendah dan stabil (6%), yang mencerminkan pendekatan investasi berisiko rendah.
+                    </p>
+                    <p><strong>Contoh Aset:</strong></p>
+                    <ul>
+                        <li><strong>Obligasi Pemerintah (SBN):</strong> Surat utang negara yang dianggap sangat aman.</li>
+                        <li><strong>Deposito Bank:</strong> Simpanan berjangka dengan bunga tetap.</li>
+                        <li><strong>Emas:</strong> Aset safe-haven yang cenderung stabil.</li>
+                        <li><strong>Reksadana Pasar Uang:</strong> Portofolio berisi instrumen pasar uang jangka pendek.</li>
+                    </ul>
+                </div>
+                 <div>
+                    <h4 className="mb-1 font-semibold text-foreground">Skenario Agresif (Garis "Aggressive")</h4>
+                    <p>
+                        <strong>Apa itu:</strong> Skenario ini menggunakan asumsi return tahunan yang lebih tinggi (20%) untuk menunjukkan potensi pertumbuhan dari investasi berisiko lebih tinggi.
+                    </p>
+                     <p><strong>Contoh Aset (dengan diversifikasi):</strong></p>
+                    <ul>
+                        <li><strong>Indeks Saham (ETF):</strong> Seperti S&P 500 (VOO) atau NASDAQ 100 (QQQ) yang berisi saham perusahaan top AS.</li>
+                        <li><strong>Aset Digital:</strong> Seperti Bitcoin (BTC) atau Ethereum (ETH), yang memiliki volatilitas tinggi.</li>
+                        <li><strong>Reksadana Saham:</strong> Portofolio yang dikelola secara aktif yang berinvestasi di pasar saham.</li>
+                    </ul>
                 </div>
             </div>
           </AccordionContent>
