@@ -96,9 +96,6 @@ export function calculateInvestmentGrowth(
 
   // --- Using Nominal Monthly Rate (annual rate / 12) ---
   const monthlyNominalRate = annualNominalRate / 12;
-  const realAnnualRate = (1 + annualNominalRate) / (1 + annualInflationRate) - 1;
-  const monthlyRealRate = realAnnualRate / 12;
-
 
   // Scenario Rates
   const conservativeRate = 0.06; // 6%
@@ -112,7 +109,7 @@ export function calculateInvestmentGrowth(
     const months = year * 12;
 
     const nominalValue = calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType);
-    const realValue = calculateTotalFv(currentSavings, monthlySavings, monthlyRealRate, months, annuityType);
+    const realValue = nominalValue / Math.pow(1 + annualInflationRate, year);
     
     // Scenario calculations
     const noInvestment = currentSavings + (monthlySavings * months);
