@@ -17,10 +17,8 @@ export function InvestmentCalculator() {
 
     // Using setTimeout to ensure loading state is visible for a short duration
     setTimeout(() => {
-        const chartData = calculateInvestmentGrowth(data);
-        setResult({
-            chartData,
-        });
+        const resultData = calculateInvestmentGrowth(data);
+        setResult(resultData);
         setIsLoading(false);
     }, 500);
   };

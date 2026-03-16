@@ -38,7 +38,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
     return <LoadingState />;
   }
 
-  if (!result) {
+  if (!result || !result.chartData || result.chartData.length === 0) {
     return <InitialState />;
   }
 
@@ -54,6 +54,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
 
   const shortfall = targetAmount - finalNominalValue;
   const principalPercentage = (totalInvestment / finalNominalValue) * 100;
+  const lastYearData = chartData[chartData.length - 1];
 
   return (
     <div className="space-y-6">
@@ -85,7 +86,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
               <span>Goal Overview</span>
             </div>
             <span className="text-sm font-medium text-muted-foreground">
-                In {chartData[chartData.length-1].year} Years
+                In {lastYearData.year} Years
             </span>
           </CardTitle>
         </CardHeader>
@@ -141,7 +142,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
         </CardContent>
       </Card>
 
-      {!isTargetMet && recommendations.length > 0 && (
+      {!isTargetMet && recommendations && recommendations.length > 0 && (
         <Card>
              <CardHeader>
                 <CardTitle className="flex items-center gap-2">
