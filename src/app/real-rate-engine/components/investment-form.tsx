@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -20,14 +21,24 @@ import { Loader2 } from 'lucide-react';
 import { cn, formatRupiah, parseRupiah } from '@/lib/utils';
 
 const formSchema = z.object({
+  investmentType: z.enum(['withMonthly', 'lumpSumOnly']),
   currentSavings: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
-  monthlySavings: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
+  monthlySavings: z.string(),
   targetAmount: z.string().refine(val => parseRupiah(val) > 0, {message: "Must be a positive number"}),
   expectedReturnRate: z.coerce.number().min(0).max(100),
   inflationRate: z.coerce.number().min(0).max(100),
   timeHorizonYears: z.coerce.number().min(1).max(100),
   annuityType: z.enum(['ordinary', 'due']),
+}).refine(data => {
+    if (data.investmentType === 'withMonthly') {
+        return parseRupiah(data.monthlySavings) >= 0;
+    }
+    return true;
+}, {
+    message: "Must be a positive number",
+    path: ["monthlySavings"],
 });
+
 
 type InvestmentFormProps = {
   onCalculate: (data: InvestmentInput) => void;
@@ -38,6 +49,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      investmentType: 'withMonthly',
       currentSavings: 'Rp 10,000,000',
       monthlySavings: 'Rp 1,000,000',
       targetAmount: 'Rp 1,000,000,000',
@@ -48,12 +60,25 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
     },
   });
 
+  const investmentType = form.watch('investmentType');
+
+  useEffect(() => {
+    if (investmentType === 'lumpSumOnly') {
+      form.setValue('monthlySavings', formatRupiah(0));
+    }
+  }, [investmentType, form]);
+
   function onSubmit(values: z.infer<typeof formSchema>) {
+    const monthlySavingsValue = values.investmentType === 'lumpSumOnly' ? 0 : parseRupiah(values.monthlySavings);
+    
     onCalculate({
-        ...values,
         currentSavings: parseRupiah(values.currentSavings),
-        monthlySavings: parseRupiah(values.monthlySavings),
+        monthlySavings: monthlySavingsValue,
         targetAmount: parseRupiah(values.targetAmount),
+        expectedReturnRate: values.expectedReturnRate,
+        inflationRate: values.inflationRate,
+        timeHorizonYears: values.timeHorizonYears,
+        annuityType: values.annuityType,
     });
   }
 
@@ -68,11 +93,45 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
             <FormField
+              control={form.control}
+              name="investmentType"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Investment Type</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="withMonthly" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Lump Sum & Monthly Savings
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="lumpSumOnly" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Lump Sum Only
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
                 control={form.control}
                 name="currentSavings"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Current Savings</FormLabel>
+                    <FormLabel>Initial Investment (Lump Sum)</FormLabel>
                     <FormControl>
                         <Input {...field} onChange={handleRupiahChange("currentSavings")} onBlur={field.onBlur}/>
                     </FormControl>
@@ -87,7 +146,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     <FormItem>
                     <FormLabel>Monthly Savings</FormLabel>
                     <FormControl>
-                        <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={field.onBlur} />
+                        <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={field.onBlur} disabled={investmentType === 'lumpSumOnly'} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
