@@ -58,7 +58,7 @@ export function MainNav() {
       <nav className="hidden items-center space-x-2 md:flex lg:space-x-4">
         {mainNav.map((item) => (
           <Link
-            key={item.href}
+            key={item.title}
             href={item.href}
             className={cn(
               'rounded-md px-3 py-2 text-sm font-medium transition-colors',
@@ -90,7 +90,7 @@ export function MainNav() {
             <nav className="flex flex-col space-y-2">
               {mainNav.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.title}
                   href={item.href}
                   className={cn(
                     'flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium',
