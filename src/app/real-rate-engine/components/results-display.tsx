@@ -3,7 +3,7 @@
 import type { CalculationResult } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GrowthChart } from './growth-chart';
-import { Lightbulb, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 type ResultsDisplayProps = {
@@ -33,20 +33,6 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
           <GrowthChart data={result.chartData} />
         </CardContent>
       </Card>
-
-      <Card className="bg-primary/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            <Lightbulb className="h-6 w-6" />
-            <span>AI Powered Insight</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="prose prose-sm max-w-none text-foreground">
-            <p>{result.aiInsight}</p>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
@@ -59,8 +45,7 @@ function InitialState() {
       </div>
       <h3 className="mt-4 text-xl font-semibold">Your Results Await</h3>
       <p className="mt-1 text-muted-foreground">
-        Fill out the form to see your investment projection and AI-powered
-        insights.
+        Fill out the form to see your investment projection.
       </p>
     </div>
   );
@@ -75,16 +60,6 @@ function LoadingState() {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[300px] w-full" />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-7 w-2/5" />
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-4/5" />
         </CardContent>
       </Card>
     </div>

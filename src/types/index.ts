@@ -15,5 +15,4 @@ export type ChartDataPoint = {
 
 export type CalculationResult = {
   chartData: ChartDataPoint[];
-  aiInsight: string;
 };

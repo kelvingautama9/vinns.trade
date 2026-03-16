@@ -5,41 +5,24 @@ import { InvestmentForm } from './investment-form';
 import { ResultsDisplay } from './results-display';
 import type { CalculationResult, InvestmentInput } from '@/types';
 import { calculateInvestmentGrowth } from '@/lib/finance';
-import { getInvestmentInsight } from '../actions';
-import { useToast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 
 export function InvestmentCalculator() {
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
-  const handleCalculate = async (data: InvestmentInput) => {
+  const handleCalculate = (data: InvestmentInput) => {
     setIsLoading(true);
     setResult(null);
 
-    // Perform calculations
-    const chartData = calculateInvestmentGrowth(data);
-    
-    // Fetch AI insight
-    const insightPromise = getInvestmentInsight(data);
-
-    const [insightResult] = await Promise.all([insightPromise]);
-
-    if (insightResult.error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: insightResult.error,
-      });
-    }
-
-    setResult({
-      chartData,
-      aiInsight: insightResult.data ?? "Could not generate insight.",
-    });
-
-    setIsLoading(false);
+    // Using setTimeout to ensure loading state is visible for a short duration
+    setTimeout(() => {
+        const chartData = calculateInvestmentGrowth(data);
+        setResult({
+            chartData,
+        });
+        setIsLoading(false);
+    }, 500);
   };
 
   return (
