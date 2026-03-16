@@ -35,18 +35,6 @@ export const mainNav: NavItem[] = [
     href: '/financial-freedom-calculator',
     icon: Goal,
   },
-  {
-    title: 'Portfolio Analysis',
-    href: '#',
-    disabled: true,
-    icon: Briefcase,
-  },
-  {
-    title: 'Market Trends',
-    href: '#',
-    disabled: true,
-    icon: Briefcase,
-  },
 ];
 
 export function MainNav() {
