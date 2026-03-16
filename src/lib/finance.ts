@@ -57,10 +57,10 @@ function findRequiredRate(pv: number, pmt: number, targetFv: number, periods: nu
     if (pv + pmt * periods >= targetFv) return 0; // No return needed
 
     let low = 0;
-    let high = 1; // 100% annual rate
+    let high = 1; // Search up to 100% monthly rate, which is an extreme 1200% annual rate.
     let mid = 0;
     
-    // Iteratively find the rate. Max 100 iterations.
+    // Iteratively find the monthly rate. Max 100 iterations.
     for(let i=0; i<100; i++) {
         mid = (low + high) / 2;
         const fv = calculateTotalFv(pv, pmt, mid, periods, type);
@@ -72,7 +72,7 @@ function findRequiredRate(pv: number, pmt: number, targetFv: number, periods: nu
             high = mid;
         }
     }
-    return Math.pow(1 + mid, 12) - 1; // Convert monthly rate to annual
+    return mid * 12; // Convert monthly nominal rate to annual nominal rate
 }
 
 
@@ -93,31 +93,40 @@ export function calculateInvestmentGrowth(
 
   const annualNominalRate = expectedReturnRate / 100;
   const annualInflationRate = inflationRate / 100;
+  // Fisher Equation for real rate of return
   const annualRealRate = (1 + annualNominalRate) / (1 + annualInflationRate) - 1;
 
-  const monthlyNominalRate = Math.pow(1 + annualNominalRate, 1 / 12) - 1;
-  const monthlyRealRate = Math.pow(1 + annualRealRate, 1 / 12) - 1;
+  // --- Using Nominal Monthly Rate (annual rate / 12) as per user's logic ---
+  const monthlyNominalRate = annualNominalRate / 12;
+  const monthlyRealRate = annualRealRate / 12;
 
   // Scenario Rates
   const conservativeRate = 0.06; // 6%
   const aggressiveRate = 0.20; // 20%
-  const monthlyConservativeRate = Math.pow(1 + conservativeRate, 1 / 12) - 1;
-  const monthlyAggressiveRate = Math.pow(1 + aggressiveRate, 1 / 12) - 1;
+  const monthlyConservativeRate = conservativeRate / 12;
+  const monthlyAggressiveRate = aggressiveRate / 12;
   
   const chartData: ChartDataPoint[] = [];
 
   for (let year = 0; year <= timeHorizonYears; year++) {
     const months = year * 12;
 
-    const nominalValue = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType));
-    const realValue = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyRealRate, months, annuityType));
+    const nominalValue = calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType);
+    const realValue = calculateTotalFv(currentSavings, monthlySavings, monthlyRealRate, months, annuityType);
     
     // Scenario calculations
-    const noInvestment = Math.round(currentSavings + (monthlySavings * months));
-    const conservative = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyConservativeRate, months, annuityType));
-    const aggressive = Math.round(calculateTotalFv(currentSavings, monthlySavings, monthlyAggressiveRate, months, annuityType));
+    const noInvestment = currentSavings + (monthlySavings * months);
+    const conservative = calculateTotalFv(currentSavings, monthlySavings, monthlyConservativeRate, months, annuityType);
+    const aggressive = calculateTotalFv(currentSavings, monthlySavings, monthlyAggressiveRate, months, annuityType);
 
-    chartData.push({ year, nominalValue, realValue, noInvestment, conservative, aggressive });
+    chartData.push({ 
+        year, 
+        nominalValue: Math.round(nominalValue), 
+        realValue: Math.round(realValue), 
+        noInvestment: Math.round(noInvestment), 
+        conservative: Math.round(conservative), 
+        aggressive: Math.round(aggressive) 
+    });
   }
 
   const finalNominalValue = chartData[chartData.length - 1].nominalValue;
@@ -149,11 +158,11 @@ export function calculateInvestmentGrowth(
     }
 
     // 3. Increase Return Rate
-    const requiredRate = findRequiredRate(currentSavings, monthlySavings, targetAmount, timeHorizonYears * 12, annuityType);
-     if (requiredRate > annualNominalRate && isFinite(requiredRate)) {
+    const requiredAnnualRate = findRequiredRate(currentSavings, monthlySavings, targetAmount, timeHorizonYears * 12, annuityType);
+     if (requiredAnnualRate > annualNominalRate && isFinite(requiredAnnualRate)) {
         recommendations.push({
             type: 'increaseReturnRate',
-            value: requiredRate * 100,
+            value: requiredAnnualRate * 100,
             text: 'Find an investment with a higher annual return.'
         });
     }
