@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { CalculationResult, Recommendation } from '@/types';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatRupiah } from '@/lib/utils';
-import { Frown, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
+import { Frown, Info, Sparkles, Star, Target, TrendingUp, Zap } from 'lucide-react';
 import { GrowthChart } from './growth-chart';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -141,6 +142,39 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
           </div>
         </CardContent>
       </Card>
+      
+      <Accordion type="single" collapsible className="w-full rounded-lg border bg-card px-6 text-card-foreground shadow-sm">
+        <AccordionItem value="item-1" className="border-b-0">
+          <AccordionTrigger className="hover:no-underline">
+            <div className="flex items-center gap-2 text-base font-semibold">
+              <Info className="h-5 w-5 text-primary" />
+              <span>Understanding Nominal vs. Real Value</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="pt-2">
+            <div className="prose prose-sm dark:prose-invert max-w-none space-y-4 text-muted-foreground">
+                <div>
+                    <h4 className="mb-1 font-semibold text-foreground">Nilai Nominal (Garis "Your Projection (Nominal)")</h4>
+                    <p>
+                        <strong>Apa itu:</strong> Ini adalah jumlah uang <strong>aktual</strong> yang akan ada di akun investasi Anda di masa depan. Jika kalkulator memproyeksikan Anda akan memiliki Rp 1 Miliar dalam 10 tahun, inilah angka yang akan Anda lihat di rekening Anda.
+                    </p>
+                    <p>
+                        <strong>Keterbatasan:</strong> Angka ini tidak memperhitungkan bahwa harga barang dan jasa akan naik seiring waktu (karena inflasi). Jadi, meskipun angkanya besar, daya belinya mungkin tidak sebesar yang Anda kira.
+                    </p>
+                </div>
+                <div>
+                    <h4 className="mb-1 font-semibold text-foreground">Nilai Riil (Garis "Your Projection (Real)")</h4>
+                     <p>
+                        <strong>Apa itu:</strong> Ini adalah <strong>daya beli sesungguhnya</strong> dari uang Anda di masa depan, yang diukur dengan nilai uang hari ini. Garis ini menjawab pertanyaan: "Jika saya memiliki Rp 1 Miliar dalam 10 tahun, berapa nilainya jika dibandingkan dengan uang hari ini?"
+                    </p>
+                    <p>
+                        <strong>Mengapa ini Penting:</strong> Inilah ukuran kekayaan Anda yang paling jujur. Garis ini menunjukkan apakah investasi Anda benar-benar tumbuh lebih cepat daripada kenaikan harga-harga. Jika garis Nilai Riil menanjak, berarti kekayaan Anda secara efektif bertambah.
+                    </p>
+                </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       {!isTargetMet && recommendations && recommendations.length > 0 && (
         <Card>
