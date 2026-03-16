@@ -44,6 +44,7 @@ function findRequiredMonthlySavings(pv: number, targetFv: number, rate: number, 
 
 function findRequiredTime(pv: number, pmt: number, targetFv: number, rate: number, type: 'ordinary' | 'due'): number {
     if (calculateTotalFv(pv, pmt, rate, 1, type) >= targetFv) return 1/12;
+    if (rate <= 0 && (pv + pmt) < targetFv) return Infinity; // Cannot reach target if rate is non-positive and we're not already there
 
     let months = 1;
     while(calculateTotalFv(pv, pmt, rate, months, type) < targetFv) {
@@ -93,6 +94,7 @@ export function calculateInvestmentGrowth(
 
   const annualNominalRate = expectedReturnRate / 100;
   const annualInflationRate = inflationRate / 100;
+  const realRateIsNegative = annualNominalRate <= annualInflationRate;
 
   // --- Using Nominal Monthly Rate (annual rate / 12) ---
   const monthlyNominalRate = annualNominalRate / 12;
@@ -173,6 +175,8 @@ export function calculateInvestmentGrowth(
     totalInterest,
     targetAmount,
     isTargetMet,
-    recommendations
+    recommendations,
+    realRateIsNegative,
+    inflationRate,
   };
 }

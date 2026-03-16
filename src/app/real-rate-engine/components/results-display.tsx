@@ -51,6 +51,8 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
     targetAmount,
     isTargetMet,
     recommendations,
+    realRateIsNegative,
+    inflationRate,
   } = result;
 
   const shortfall = targetAmount - finalNominalValue;
@@ -235,7 +237,13 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                                 <p>To reach your goal, you could increase your monthly savings to <strong className="text-primary">{formatRupiah(rec.value)}</strong>.</p>
                             )}
                              {rec.type === 'extendTimeHorizon' && (
-                                <p>To reach your goal, you could extend your investment horizon to <strong className="text-primary">{rec.value.toFixed(1)} years</strong>.</p>
+                                realRateIsNegative ? (
+                                    <p className="font-medium text-destructive">
+                                        Your return rate is below inflation ({inflationRate}%). More time will only decrease your money's real value. Aim for a return rate that beats inflation.
+                                    </p>
+                                ) : (
+                                    <p>To reach your goal, you could extend your investment horizon to <strong className="text-primary">{rec.value.toFixed(1)} years</strong>.</p>
+                                )
                             )}
                              {rec.type === 'increaseReturnRate' && (
                                 <p>To reach your goal, you would need to find an investment with an average annual return of <strong className="text-primary">{rec.value.toFixed(2)}%</strong>.</p>

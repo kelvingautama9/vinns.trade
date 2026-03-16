@@ -32,4 +32,6 @@ export type CalculationResult = {
   targetAmount: number;
   isTargetMet: boolean;
   recommendations: Recommendation[];
+  realRateIsNegative: boolean;
+  inflationRate: number;
 };
