@@ -40,6 +40,11 @@ export const mainNav: NavItem[] = [
 export function MainNav() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <>
@@ -63,43 +68,45 @@ export function MainNav() {
         ))}
       </nav>
       <div className="md:hidden">
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Open main menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-4">
-            <Link href="/" className="mb-6 flex items-center gap-2 text-lg font-bold" onClick={() => setIsMobileMenuOpen(false)}>
-              <TrendingUp className="h-6 w-6 text-primary" />
-              <span>Vinns Trade</span>
-            </Link>
-            <nav className="flex flex-col space-y-2">
-              {mainNav.map((item) => (
-                <Link
-                  key={item.title}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium',
-                    pathname === item.href
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                    item.disabled && 'pointer-events-none opacity-50'
-                  )}
-                   aria-disabled={item.disabled}
-                  onClick={(e) => {
-                    if (item.disabled) e.preventDefault();
-                    else setIsMobileMenuOpen(false);
-                  }}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.title}
-                </Link>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
+        {isMounted && (
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open main menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-4">
+              <Link href="/" className="mb-6 flex items-center gap-2 text-lg font-bold" onClick={() => setIsMobileMenuOpen(false)}>
+                <TrendingUp className="h-6 w-6 text-primary" />
+                <span>Vinns Trade</span>
+              </Link>
+              <nav className="flex flex-col space-y-2">
+                {mainNav.map((item) => (
+                  <Link
+                    key={item.title}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium',
+                      pathname === item.href
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                      item.disabled && 'pointer-events-none opacity-50'
+                    )}
+                     aria-disabled={item.disabled}
+                    onClick={(e) => {
+                      if (item.disabled) e.preventDefault();
+                      else setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.title}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        )}
       </div>
     </>
   );
