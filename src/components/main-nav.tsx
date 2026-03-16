@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, TrendingUp, Goal, Briefcase } from 'lucide-react';
@@ -39,12 +39,31 @@ export const mainNav: NavItem[] = [
 
 export function MainNav() {
   const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const [isMounted, setIsMounted] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  if (!isMounted) {
+    return (
+        <>
+            <div className="hidden h-10 w-full items-center justify-between md:flex">
+                <div className="flex gap-4">
+                    <div className="h-8 w-24 rounded-md bg-muted"></div>
+                    <div className="h-8 w-32 rounded-md bg-muted"></div>
+                    <div className="h-8 w-40 rounded-md bg-muted"></div>
+                </div>
+            </div>
+            <div className="md:hidden">
+                <Button variant="ghost" size="icon" disabled>
+                    <Menu className="h-6 w-6" />
+                </Button>
+            </div>
+        </>
+    );
+  }
 
   return (
     <>
@@ -68,7 +87,6 @@ export function MainNav() {
         ))}
       </nav>
       <div className="md:hidden">
-        {isMounted && (
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -106,7 +124,6 @@ export function MainNav() {
               </nav>
             </SheetContent>
           </Sheet>
-        )}
       </div>
     </>
   );

@@ -93,12 +93,12 @@ export function calculateInvestmentGrowth(
 
   const annualNominalRate = expectedReturnRate / 100;
   const annualInflationRate = inflationRate / 100;
-  // Fisher Equation for real rate of return
-  const annualRealRate = (1 + annualNominalRate) / (1 + annualInflationRate) - 1;
 
-  // --- Using Nominal Monthly Rate (annual rate / 12) as per user's logic ---
+  // --- Using Nominal Monthly Rate (annual rate / 12) ---
   const monthlyNominalRate = annualNominalRate / 12;
-  const monthlyRealRate = annualRealRate / 12;
+  const realAnnualRate = (1 + annualNominalRate) / (1 + annualInflationRate) - 1;
+  const monthlyRealRate = realAnnualRate / 12;
+
 
   // Scenario Rates
   const conservativeRate = 0.06; // 6%
