@@ -332,5 +332,3 @@ function LoadingState() {
     </div>
   );
 }
-
-    
