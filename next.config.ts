@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 // PENTING: Ganti nilai di bawah ini dengan nama repository GitHub Anda.
 // Contoh: jika URL repo Anda adalah "https://github.com/john-doe/my-app",
 // maka isi dengan "my-app".
-const repositoryName = 'NAMA_REPOSITORY_ANDA'; 
+const repositoryName = 'vinnstrade'; 
 
 const isProd = process.env.NODE_ENV === "production";
 
