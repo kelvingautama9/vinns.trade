@@ -39,9 +39,15 @@ const lineNames: Record<string, string> = {
 export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   const [visibleLines, setVisibleLines] = useState(initialVisibleLines);
 
-  const handleLineVisibilityChange = (key: keyof typeof initialVisibleLines) => {
-    setVisibleLines(prev => ({ ...prev, [key]: !prev[key] }));
-  };
+  const handleLineVisibilityChange = (key: string) => {
+    setVisibleLines(prev => {
+        const k = key as keyof typeof prev;
+        return {
+            ...prev,
+            [k]: !prev[k]
+        };
+    });
+};
 
   if (isLoading) {
     return <LoadingState />;
