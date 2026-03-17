@@ -72,20 +72,20 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {!isTargetMet && (
-        <Alert className="border-red-800/50 bg-red-950/70">
-          <Frown className="h-4 w-4 text-red-400" />
-          <AlertTitle className="text-red-300">Strategy Needs Adjustment</AlertTitle>
-          <AlertDescription className="text-red-400/90">
+        <Alert className="border-amber-500/20 bg-amber-500/10 backdrop-blur-lg">
+          <Frown className="h-4 w-4 text-amber-400" />
+          <AlertTitle className="text-amber-300">Strategy Needs Adjustment</AlertTitle>
+          <AlertDescription className="text-amber-400/90">
             Your current strategy may not be enough to reach your financial goal. Consider the recommendations below.
           </AlertDescription>
         </Alert>
       )}
 
       {isTargetMet && (
-         <Alert className="border-green-500/30 bg-green-900/20">
+         <Alert className="border-green-500/20 bg-green-500/10 backdrop-blur-lg">
           <Sparkles className="h-4 w-4 text-green-400" />
           <AlertTitle className="text-green-300">Congratulations!</AlertTitle>
-          <AlertDescription className="text-green-400">
+          <AlertDescription className="text-green-400/90">
             Your current strategy is on track to meet your financial goal.
           </AlertDescription>
         </Alert>
