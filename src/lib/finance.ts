@@ -214,6 +214,13 @@ export function calculatePositionSizing(
   const rrRatio = potentialProfit / potentialLoss;
   const breakevenWinRate = (1 / (1 + rrRatio)) * 100;
   
+  const series30wr: ScenarioResult = {
+      wins: 3,
+      losses: 7,
+      totalProfit: 3 * potentialProfit,
+      totalLoss: 7 * potentialLoss,
+      netOutcome: (3 * potentialProfit) - (7 * potentialLoss)
+  };
   const series40wr: ScenarioResult = {
       wins: 4,
       losses: 6,
@@ -244,6 +251,7 @@ export function calculatePositionSizing(
     potentialProfit,
     potentialLoss,
     breakevenWinRate,
+    series30wr,
     series40wr,
     series50wr,
     drawdownSeries,

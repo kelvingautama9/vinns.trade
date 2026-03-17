@@ -66,6 +66,7 @@ export type PositionSizingResult = {
     potentialProfit: number;
     potentialLoss: number;
     breakevenWinRate: number;
+    series30wr: ScenarioResult;
     series40wr: ScenarioResult;
     series50wr: ScenarioResult;
     drawdownSeries: DrawdownResult[];

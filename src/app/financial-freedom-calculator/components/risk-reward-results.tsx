@@ -30,6 +30,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
     positionSize,
     totalPositionValue,
     breakevenWinRate,
+    series30wr,
     series40wr,
     series50wr,
     drawdownSeries,
@@ -45,6 +46,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
   }
 
   const riskPercent = accountBalance > 0 ? (potentialLoss / accountBalance) * 100 : 0;
+  const profitPercent = accountBalance > 0 ? (potentialProfit / accountBalance) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -79,11 +81,12 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
                 <div className="rounded-lg p-4 bg-background/50">
                     <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><ArrowUp className="text-green-500"/> If Correct (Profit)</p>
                     <p className="text-2xl font-bold text-green-400">{formatCurrency(potentialProfit, currency)}</p>
+                    <p className="text-xs text-muted-foreground">(+{profitPercent.toFixed(2)}% of Balance)</p>
                 </div>
                 <div className="rounded-lg p-4 bg-background/50">
                     <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><ArrowDown className="text-red-500"/> If Wrong (Loss)</p>
                     <p className="text-2xl font-bold text-red-400">{formatCurrency(potentialLoss, currency)}</p>
-                    <p className="text-xs text-muted-foreground">({riskPercent.toFixed(2)}% of Balance)</p>
+                    <p className="text-xs text-muted-foreground">(-{riskPercent.toFixed(2)}% of Balance)</p>
                 </div>
             </div>
              <div className="rounded-lg p-4 bg-background/50 text-center">
@@ -132,6 +135,12 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
             </TableHeader>
             <TableBody>
               <TableRow>
+                <TableCell>30% Win Rate<br /><span className="text-xs text-muted-foreground">({series30wr.wins} Wins, {series30wr.losses} Losses)</span></TableCell>
+                <TableCell className="font-medium text-green-400">{formatCurrency(series30wr.totalProfit, currency)}</TableCell>
+                <TableCell className="font-medium text-red-400">{formatCurrency(series30wr.totalLoss, currency)}</TableCell>
+                <TableCell className={cn("text-right font-semibold", series30wr.netOutcome > 0 ? "text-green-400" : "text-red-400")}>{formatCurrency(series30wr.netOutcome, currency)}</TableCell>
+              </TableRow>
+              <TableRow>
                 <TableCell>40% Win Rate<br /><span className="text-xs text-muted-foreground">({series40wr.wins} Wins, {series40wr.losses} Losses)</span></TableCell>
                 <TableCell className="font-medium text-green-400">{formatCurrency(series40wr.totalProfit, currency)}</TableCell>
                 <TableCell className="font-medium text-red-400">{formatCurrency(series40wr.totalLoss, currency)}</TableCell>
@@ -145,9 +154,16 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
               </TableRow>
             </TableBody>
           </Table>
-          <p className="text-xs text-muted-foreground pt-3">
-            Simulation assumes each of the 10 trades has the same parameters, resulting in a consistent risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade. With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.
-          </p>
+          <div className="text-xs text-muted-foreground pt-3 space-y-2">
+            <p>
+                Simulation assumes each of the 10 trades has the same parameters, resulting in a consistent risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade.
+            </p>
+            <p>
+                With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.
+                <br/>
+                <strong>Expert Advice:</strong> If your historical win rate is low, focus on finding trades with a higher Risk:Reward ratio instead of trying to win more often.
+            </p>
+          </div>
         </CardContent>
       </Card>
       
@@ -179,7 +195,9 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
               ))}
             </TableBody>
           </Table>
-           <p className="text-xs text-muted-foreground pt-3">This shows the importance of position sizing to survive losing streaks.</p>
+           <p className="text-xs text-muted-foreground pt-3">
+              This simulation shows the impact of consecutive losses on your account balance, assuming a consistent risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade. It highlights the importance of position sizing to survive losing streaks.
+           </p>
         </CardContent>
       </Card>
        <Alert variant="default" className="text-xs text-muted-foreground">
