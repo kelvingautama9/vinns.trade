@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, cn } from '@/lib/utils';
-import { Scale, ShieldCheck, TrendingUp, ShieldAlert, BarChart, ArrowUp, ArrowDown, Target, Calculator, PieChart, ShieldX, AlertTriangle } from 'lucide-react';
+import { Scale, ShieldCheck, TrendingUp, ShieldAlert, BarChart, ArrowUp, ArrowDown, Target, Calculator, PieChart, ShieldX, AlertTriangle, Wallet } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type RiskRewardResultsProps = {
@@ -28,6 +28,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
     potentialLoss,
     rrRatio,
     positionSize,
+    totalPositionValue,
     breakevenWinRate,
     series40wr,
     series50wr,
@@ -80,6 +81,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
                 <div className="rounded-lg p-4 bg-background/50">
                     <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><ArrowDown className="text-red-500"/> If Wrong (Loss)</p>
                     <p className="text-2xl font-bold text-red-400">{formatCurrency(potentialLoss, currency)}</p>
+                    <p className="text-xs text-muted-foreground">(Your Max Risk)</p>
                 </div>
             </div>
              <div className="rounded-lg p-4 bg-background/50 text-center">
@@ -96,10 +98,16 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
                 <span>Execution Instructions</span>
             </CardTitle>
         </CardHeader>
-        <CardContent className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">Allowed Units/Lots to Buy</p>
-            <p className="text-4xl font-extrabold text-primary">{formatPositionSize(positionSize)}</p>
-            <p className="text-xs text-muted-foreground pt-2">Based on your max risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade.</p>
+        <CardContent className="space-y-4 text-center">
+            <div>
+                <p className="text-sm text-muted-foreground">Allowed Units/Lots to Buy</p>
+                <p className="text-4xl font-extrabold text-primary">{formatPositionSize(positionSize)}</p>
+            </div>
+            <div>
+                <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><Wallet /> Total Position Value</p>
+                <p className="text-xl font-bold">{formatCurrency(totalPositionValue, currency)}</p>
+            </div>
+            <p className="text-xs text-muted-foreground pt-2">Based on your max risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade to protect your capital.</p>
         </CardContent>
       </Card>
 
@@ -114,22 +122,30 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Win Rate</TableHead>
+                <TableHead>Scenario</TableHead>
+                <TableHead>Total Gains</TableHead>
+                <TableHead>Total Losses</TableHead>
                 <TableHead className="text-right">Net Outcome</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>40% (4 Wins, 6 Losses)</TableCell>
+                <TableCell>40% Win Rate<br /><span className="text-xs text-muted-foreground">({series40wr.wins} Wins, {series40wr.losses} Losses)</span></TableCell>
+                <TableCell className="font-medium text-green-400">{formatCurrency(series40wr.totalProfit, currency)}</TableCell>
+                <TableCell className="font-medium text-red-400">{formatCurrency(series40wr.totalLoss, currency)}</TableCell>
                 <TableCell className={cn("text-right font-semibold", series40wr.netOutcome > 0 ? "text-green-400" : "text-red-400")}>{formatCurrency(series40wr.netOutcome, currency)}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>50% (5 Wins, 5 Losses)</TableCell>
+                <TableCell>50% Win Rate<br /><span className="text-xs text-muted-foreground">({series50wr.wins} Wins, {series50wr.losses} Losses)</span></TableCell>
+                <TableCell className="font-medium text-green-400">{formatCurrency(series50wr.totalProfit, currency)}</TableCell>
+                <TableCell className="font-medium text-red-400">{formatCurrency(series50wr.totalLoss, currency)}</TableCell>
                 <TableCell className={cn("text-right font-semibold", series50wr.netOutcome > 0 ? "text-green-400" : "text-red-400")}>{formatCurrency(series50wr.netOutcome, currency)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <p className="text-xs text-muted-foreground pt-3">With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.</p>
+          <p className="text-xs text-muted-foreground pt-3">
+            Simulation assumes each of the 10 trades uses the same risk amount of <strong>{formatCurrency(potentialLoss, currency)}</strong>. With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.
+          </p>
         </CardContent>
       </Card>
       

@@ -210,6 +210,7 @@ export function calculatePositionSizing(
 
   // 3. Calculate Position Size based on nominal risk
   const positionSize = maxRiskNominal / clDistance;
+  const totalPositionValue = positionSize * entryPrice;
 
   // 4. Calculate Potential Profit & Loss
   const potentialProfit = positionSize * tpDistance;
@@ -220,10 +221,18 @@ export function calculatePositionSizing(
   
   // 6. "The Series of 10 Trades" Simulation
   const series40wr: ScenarioResult = {
-      netOutcome: (4 * potentialProfit) - (6 * maxRiskNominal)
+      wins: 4,
+      losses: 6,
+      totalProfit: 4 * potentialProfit,
+      totalLoss: 6 * potentialLoss,
+      netOutcome: (4 * potentialProfit) - (6 * potentialLoss)
   };
   const series50wr: ScenarioResult = {
-      netOutcome: (5 * potentialProfit) - (5 * maxRiskNominal)
+      wins: 5,
+      losses: 5,
+      totalProfit: 5 * potentialProfit,
+      totalLoss: 5 * potentialLoss,
+      netOutcome: (5 * potentialProfit) - (5 * potentialLoss)
   };
 
   // 7. Drawdown Simulation
@@ -246,5 +255,6 @@ export function calculatePositionSizing(
     series50wr,
     drawdownSeries,
     accountBalance,
+    totalPositionValue,
   };
 }

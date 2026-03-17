@@ -47,6 +47,10 @@ export type PositionSizingInput = {
 };
 
 export type ScenarioResult = {
+    wins: number;
+    losses: number;
+    totalProfit: number;
+    totalLoss: number;
     netOutcome: number;
 };
 
@@ -66,4 +70,5 @@ export type PositionSizingResult = {
     series50wr: ScenarioResult;
     drawdownSeries: DrawdownResult[];
     accountBalance: number;
+    totalPositionValue: number;
 };
