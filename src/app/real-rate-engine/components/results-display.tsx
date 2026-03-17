@@ -60,8 +60,8 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
     isTargetMet,
     recommendations,
     realRateIsNegative,
-    inflationRate,
     expectedReturnRate,
+    inflationRate,
   } = result;
 
   const shortfall = targetAmount - finalNominalValue;
@@ -72,20 +72,20 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {!isTargetMet && (
-        <Alert className="border-neutral-700 bg-neutral-800/50 backdrop-blur-lg">
-          <Frown className="h-4 w-4 text-red-400" />
-          <AlertTitle className="text-red-300">Strategy Needs Adjustment</AlertTitle>
-          <AlertDescription className="text-red-400/90">
+        <Alert variant="destructive" className="border-destructive/50 bg-destructive/10 text-destructive backdrop-blur-lg">
+          <Frown className="h-4 w-4" />
+          <AlertTitle>Strategy Needs Adjustment</AlertTitle>
+          <AlertDescription>
             Your current strategy may not be enough to reach your financial goal. Consider the recommendations below.
           </AlertDescription>
         </Alert>
       )}
 
       {isTargetMet && (
-         <Alert className="border-neutral-700 bg-neutral-800/50 backdrop-blur-lg">
-          <Sparkles className="h-4 w-4 text-green-400" />
-          <AlertTitle className="text-green-300">Congratulations!</AlertTitle>
-          <AlertDescription className="text-green-400/90">
+         <Alert className="border-success/50 bg-success/10 text-success backdrop-blur-lg">
+          <Sparkles className="h-4 w-4" />
+          <AlertTitle>Congratulations!</AlertTitle>
+          <AlertDescription>
             Your current strategy is on track to meet your financial goal.
           </AlertDescription>
         </Alert>
@@ -113,12 +113,12 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                     <p className="text-sm text-muted-foreground">Projected Value</p>
                     <p className={cn(
                         "text-2xl font-bold",
-                        isTargetMet ? "text-green-400" : "text-red-400"
+                        isTargetMet ? "text-success" : "text-destructive"
                     )}>{formatRupiah(finalNominalValue)}</p>
                 </div>
             </div>
             {!isTargetMet && shortfall > 0 && (
-                <div className="text-center font-medium text-red-400">
+                <div className="text-center font-medium text-destructive">
                     You are short by {formatRupiah(shortfall)}
                 </div>
             )}
@@ -146,7 +146,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
               <div key={key} className="flex items-center gap-2">
                 <Checkbox
                   id={key}
-                  checked={visibleLines[key as keyof typeof visibleLines]}
+                  checked={visibleLines[key as keyof typeof initialVisibleLines]}
                   onCheckedChange={() => handleLineVisibilityChange(key)}
                 />
                 <Label htmlFor={key} className="cursor-pointer text-muted-foreground">
@@ -246,13 +246,13 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
           <AccordionContent className="px-6">
             <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-muted-foreground">
                 <div>
-                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><ShieldCheck className="text-red-400" />No Investment Scenario</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><ShieldCheck className="text-muted-foreground" />No Investment Scenario</h4>
                     <p>
                         <strong>Analysis:</strong> This line is your most important benchmark; it shows the opportunity cost of not investing. You can clearly see how inflation erodes the purchasing power of your savings over time, even as you continue to save. This is the "worst-case" scenario for long-term wealth growth.
                     </p>
                 </div>
                  <div>
-                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Turtle className="text-amber-400" />Conservative Scenario (6% Return)</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Turtle className="text-chart-4" />Conservative Scenario (6% Return)</h4>
                     <p>
                         <strong>Risk Profile:</strong> Very Low. The main focus is to protect capital from inflation while achieving modest growth. Suitable for investors who are risk-averse or for short-term financial goals (1-3 years).
                     </p>
@@ -264,7 +264,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                     </ul>
                 </div>
                  <div>
-                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Rabbit className="text-purple-400" />Aggressive Scenario (20% Return)</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Rabbit className="text-chart-5" />Aggressive Scenario (20% Return)</h4>
                     <p>
                          <strong>Risk Profile:</strong> High. This scenario aims for maximum capital growth and is willing to accept significant price volatility in the short term. Suitable for investors with a long time horizon (5+ years).
                     </p>
