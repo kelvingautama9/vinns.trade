@@ -28,6 +28,14 @@ const initialVisibleLines = {
   aggressive: false,
 };
 
+const lineNames: Record<string, string> = {
+    nominalValue: 'Your Projection (Nominal)',
+    realValue: 'Your Projection (Real)',
+    noInvestment: 'No Investment',
+    conservative: 'Conservative Strategy (6%)',
+    aggressive: 'Aggressive Strategy (20%)',
+}
+
 export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   const [visibleLines, setVisibleLines] = useState(initialVisibleLines);
 
@@ -53,6 +61,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
     recommendations,
     realRateIsNegative,
     inflationRate,
+    expectedReturnRate
   } = result;
 
   const shortfall = targetAmount - finalNominalValue;
@@ -63,17 +72,17 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {!isTargetMet && (
-        <Alert variant="destructive" className="bg-red-900/20 border-red-500/30">
-          <Frown className="h-4 w-4" />
-          <AlertTitle>Strategy Needs Adjustment</AlertTitle>
-          <AlertDescription>
+        <Alert variant="destructive" className="border-amber-500/30 bg-amber-900/20">
+          <Frown className="h-4 w-4 text-amber-400" />
+          <AlertTitle className="text-amber-300">Strategy Needs Adjustment</AlertTitle>
+          <AlertDescription className="text-amber-400">
             Your current strategy may not be enough to reach your financial goal. Consider the recommendations below.
           </AlertDescription>
         </Alert>
       )}
 
       {isTargetMet && (
-         <Alert className="bg-green-900/20 border-green-500/30">
+         <Alert className="border-green-500/30 bg-green-900/20">
           <Sparkles className="h-4 w-4 text-green-400" />
           <AlertTitle className="text-green-300">Congratulations!</AlertTitle>
           <AlertDescription className="text-green-400">
@@ -95,12 +104,12 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                 <div className="rounded-lg p-4 bg-white/5">
+            <div className="grid grid-cols-1 gap-4 text-center md:grid-cols-2">
+                 <div className="rounded-lg bg-white/5 p-4">
                     <p className="text-sm text-muted-foreground">Your Goal</p>
                     <p className="text-2xl font-bold">{formatRupiah(targetAmount)}</p>
                 </div>
-                 <div className="rounded-lg p-4 bg-white/5">
+                 <div className="rounded-lg bg-white/5 p-4">
                     <p className="text-sm text-muted-foreground">Projected Value</p>
                     <p className={cn(
                         "text-2xl font-bold",
@@ -118,7 +127,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                     <span>Principal: {formatRupiah(totalInvestment)} ({principalPercentage.toFixed(0)}%)</span>
                     <span>Interest: {formatRupiah(totalInterest)} ({interestPercentage.toFixed(0)}%)</span>
                 </div>
-                <Progress value={principalPercentage} />
+                <Progress value={principalPercentage} className="h-2" />
             </div>
         </CardContent>
       </Card>
@@ -132,7 +141,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
         </CardHeader>
         <CardContent>
           <GrowthChart data={chartData} visibleLines={visibleLines} />
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
+          <div className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 lg:grid-cols-5">
             {Object.keys(visibleLines).map(key => (
               <div key={key} className="flex items-center gap-2">
                 <Checkbox
@@ -140,7 +149,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                   checked={visibleLines[key as keyof typeof visibleLines]}
                   onCheckedChange={() => handleLineVisibilityChange(key)}
                 />
-                <Label htmlFor={key} className="text-muted-foreground cursor-pointer">
+                <Label htmlFor={key} className="cursor-pointer text-muted-foreground">
                   {lineNames[key as keyof typeof lineNames].split('(')[0]}
                 </Label>
               </div>
@@ -169,7 +178,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                         ))}
                     </TabsList>
                     {recommendations.map(rec => (
-                        <TabsContent key={rec.type} value={rec.type} className="mt-4 text-center p-2 prose prose-sm dark:prose-invert max-w-none">
+                        <TabsContent key={rec.type} value={rec.type} className="prose prose-sm dark:prose-invert mt-4 max-w-none p-2 text-center">
                             {rec.type === 'increaseMonthlySavings' && (
                                 <p>To reach your goal with your current timeline and return rate, you could increase your monthly savings to <strong className="text-primary">{formatRupiah(rec.value)}</strong>. This adjustment targets your goal of {formatRupiah(targetAmount)}.</p>
                             )}
@@ -177,9 +186,9 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                                 realRateIsNegative ? (
                                     <div>
                                         <p className="font-medium text-destructive">
-                                            Your return rate ({result.expectedReturnRate}%) is below inflation ({inflationRate}%). Extending time will only <strong className='text-destructive'>decrease</strong> your money's real value.
+                                            Your return rate ({expectedReturnRate}%) is below inflation ({inflationRate}%). Extending time will only <strong className='text-destructive'>decrease</strong> your money's real value.
                                         </p>
-                                        <p className="text-muted-foreground mt-2">
+                                        <p className="mt-2 text-muted-foreground">
                                             <strong>Analogi:</strong> Bayangkan Anda punya sebungkus permen. Setiap tahun, teman Anda mengambil satu permen (inflasi), tapi Anda hanya mendapat setengah permen baru (return). Semakin lama, permen Anda akan semakin sedikit. Anda harus mencari cara agar permen yang Anda dapat lebih banyak dari yang diambil.
                                         </p>
                                     </div>
@@ -198,72 +207,72 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
       )}
 
       <Accordion type="multiple" className="w-full space-y-4">
-        <AccordionItem value="item-1" className="rounded-2xl border border-white/10 bg-card/70 text-card-foreground shadow-xl backdrop-blur-lg">
+        <AccordionItem value="item-1" className="rounded-xl border-none bg-card text-card-foreground shadow-lg">
           <AccordionTrigger className="px-6 hover:no-underline">
-            <div className="flex items-center gap-2 text-base font-semibold">
+            <div className="flex items-center gap-3 text-base font-semibold">
               <Info className="h-5 w-5 text-primary" />
-              <span>Memahami Proyeksi Nilai</span>
+              <span>Understanding Your Projection</span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-6">
             <div className="prose prose-sm dark:prose-invert max-w-none space-y-4 text-muted-foreground">
                 <div>
-                    <h4 className="mb-1 font-semibold text-foreground">Nilai Nominal (Garis Biru)</h4>
+                    <h4 className="mb-1 font-semibold text-foreground">Nominal Value (Nominal)</h4>
                     <p>
-                        <strong>Apa itu:</strong> Ini adalah jumlah uang <strong>aktual</strong> yang akan ada di akun investasi Anda di masa depan. Jika kalkulator memproyeksikan Anda akan memiliki Rp 1 Miliar dalam 10 tahun, inilah angka yang akan Anda lihat di rekening Anda.
+                        <strong>What it is:</strong> This is the actual amount of money that will be in your investment account in the future. If the calculator projects you will have Rp 1 Billion in 10 years, this is the number you will see in your account statement.
                         <br />
-                        <strong>Keterbatasan:</strong> Angka ini tidak memperhitungkan bahwa harga barang dan jasa akan naik seiring waktu (karena inflasi). Jadi, meskipun angkanya besar, daya belinya mungkin tidak sebesar yang Anda kira.
+                        <strong>Its Limitation:</strong> This number doesn't account for the fact that the prices of goods and services will rise over time (due to inflation). So, while the number is big, its purchasing power might not be as great as you think.
                     </p>
                 </div>
                 <div>
-                    <h4 className="mb-1 font-semibold text-foreground">Nilai Riil (Garis Hijau)</h4>
+                    <h4 className="mb-1 font-semibold text-foreground">Real Value (Real)</h4>
                      <p>
-                        <strong>Apa itu:</strong> Ini adalah <strong>daya beli sesungguhnya</strong> dari uang Anda di masa depan, yang diukur dengan nilai uang hari ini. Garis ini menjawab pertanyaan: "Jika saya memiliki Rp 1 Miliar dalam 10 tahun, berapa nilainya jika dibandingkan dengan uang hari ini?"
+                        <strong>What it is:</strong> This is the true **purchasing power** of your money in the future, measured in today's money. This line answers the question: "If I have Rp 1 Billion in 10 years, what is its value compared to today's money?"
                          <br />
-                        <strong>Mengapa ini Penting:</strong> Inilah ukuran kekayaan Anda yang paling jujur. Garis ini menunjukkan apakah investasi Anda benar-benar tumbuh lebih cepat daripada kenaikan harga-harga. Jika garis Nilai Riil menanjak, berarti kekayaan Anda secara efektif bertambah.
+                        <strong>Why it Matters:</strong> This is the most honest measure of your wealth. This line shows whether your investment is truly growing faster than the rise in prices. If the Real Value line is trending up, it means your wealth is effectively increasing.
                     </p>
                 </div>
             </div>
           </AccordionContent>
         </AccordionItem>
         
-        <AccordionItem value="item-2" className="rounded-2xl border border-white/10 bg-card/70 text-card-foreground shadow-xl backdrop-blur-lg">
+        <AccordionItem value="item-2" className="rounded-xl border-none bg-card text-card-foreground shadow-lg">
           <AccordionTrigger className="px-6 hover:no-underline">
-            <div className="flex items-center gap-2 text-base font-semibold">
+            <div className="flex items-center gap-3 text-base font-semibold">
               <HelpCircle className="h-5 w-5 text-primary" />
-              <span>Memahami Skenario Alternatif</span>
+              <span>Alternative Scenario Analysis</span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-6">
             <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-muted-foreground">
                 <div>
-                    <h4 className="mb-1 flex items-center gap-2 font-semibold text-foreground"><ShieldCheck className="text-red-400" />Skenario Tanpa Investasi (Garis Merah)</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><ShieldCheck className="text-red-400" />No Investment Scenario</h4>
                     <p>
-                        <strong>Analisis:</strong> Garis ini adalah benchmark terpenting Anda; ia menunjukkan biaya peluang (opportunity cost) jika tidak berinvestasi. Anda bisa melihat dengan jelas bagaimana inflasi menggerus daya beli tabungan Anda dari waktu ke waktu, bahkan saat Anda terus menabung. Ini adalah skenario "terburuk" untuk pertumbuhan kekayaan jangka panjang.
+                        <strong>Analysis:</strong> This line is your most important benchmark; it shows the opportunity cost of not investing. You can clearly see how inflation erodes the purchasing power of your savings over time, even as you continue to save. This is the "worst-case" scenario for long-term wealth growth.
                     </p>
                 </div>
                  <div>
-                    <h4 className="mb-1 flex items-center gap-2 font-semibold text-foreground"><Turtle className="text-yellow-400" />Skenario Konservatif (6% Return)</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Turtle className="text-amber-400" />Conservative Scenario (6% Return)</h4>
                     <p>
-                        <strong>Profil Risiko:</strong> Sangat Rendah. Fokus utama adalah melindungi modal dari inflasi sambil mendapatkan sedikit pertumbuhan. Cocok untuk investor yang tidak ingin mengambil risiko atau untuk tujuan keuangan jangka pendek (1-3 tahun).
+                        <strong>Risk Profile:</strong> Very Low. The main focus is to protect capital from inflation while achieving modest growth. Suitable for investors who are risk-averse or for short-term financial goals (1-3 years).
                     </p>
-                    <p><strong>Contoh Aset:</strong></p>
-                    <ul className='list-disc pl-5'>
-                        <li><strong>Obligasi Pemerintah (SBN/FR):</strong> Dianggap sebagai aset paling aman karena dijamin oleh negara. Waktu terbaik untuk masuk adalah saat suku bunga acuan sedang tinggi, karena ini mengunci yield yang lebih tinggi untuk tahun-tahun mendatang.</li>
-                        <li><strong>Deposito Bank Digital (BPR):</strong> Menawarkan bunga lebih tinggi dari bank konvensional dan dijamin oleh LPS hingga batas tertentu. Cocok untuk menyimpan dana darurat atau dana jangka pendek.</li>
-                        <li><strong>Reksadana Pasar Uang:</strong> Portofolio yang sangat likuid berisi instrumen pasar uang dengan jatuh tempo di bawah 1 tahun. Hampir tidak memiliki risiko penurunan nilai pokok.</li>
+                    <p><strong>Asset Examples:</strong></p>
+                    <ul className='list-disc space-y-1 pl-5'>
+                        <li><strong>Government Bonds (SBN/FR):</strong> Considered the safest asset because they are guaranteed by the state. The best time to enter is when the benchmark interest rate is high, as this locks in a higher yield for future years.</li>
+                        <li><strong>Digital Bank Deposits (BPR):</strong> Offer higher interest than conventional banks and are guaranteed by the Deposit Insurance Corporation (LPS) up to a certain limit. Suitable for storing emergency funds or short-term funds.</li>
+                        <li><strong>Money Market Mutual Funds:</strong> A highly liquid portfolio containing money market instruments with maturities of less than 1 year. They have almost no risk of principal loss.</li>
                     </ul>
                 </div>
                  <div>
-                    <h4 className="mb-1 flex items-center gap-2 font-semibold text-foreground"><Rabbit className="text-purple-400" />Skenario Agresif (20% Return)</h4>
+                    <h4 className="mb-2 flex items-center gap-2 font-semibold text-foreground"><Rabbit className="text-purple-400" />Aggressive Scenario (20% Return)</h4>
                     <p>
-                         <strong>Profil Risiko:</strong> Tinggi. Skenario ini bertujuan untuk pertumbuhan modal yang maksimal dan bersedia menerima volatilitas harga yang signifikan dalam jangka pendek. Cocok untuk investor dengan horizon waktu panjang (5+ tahun).
+                         <strong>Risk Profile:</strong> High. This scenario aims for maximum capital growth and is willing to accept significant price volatility in the short term. Suitable for investors with a long time horizon (5+ years).
                     </p>
-                     <p><strong>Contoh Aset (dengan diversifikasi):</strong></p>
-                    <ul className='list-disc pl-5'>
-                        <li><strong>Indeks Saham AS (ETF: VOO/IVV, QQQ):</strong> Daripada memilih satu saham, Anda membeli "sekeranjang" saham dari 500 atau 100 perusahaan terbesar di AS. Waktu terbaik untuk akumulasi adalah secara berkala (Dollar Cost Averaging/DCA) setiap bulan, terutama saat pasar sedang terkoreksi (turun). Ini adalah strategi inti yang digunakan oleh banyak investor sukses seperti Warren Buffett.</li>
-                        <li><strong>Aset Digital (Bitcoin, Ethereum):</strong> Memiliki potensi return tertinggi dengan risiko tertinggi. Alokasikan porsi kecil dari portofolio (1-5%). Waktu terbaik untuk membeli adalah saat pasar sedang "takut" atau setelah penurunan besar (bear market), bukan saat semua orang membicarakannya (bull market peak).</li>
-                        <li><strong>Reksadana Saham Teknologi/Indeks Teknologi:</strong> Berinvestasi pada sektor yang mendorong inovasi. Seperti indeks saham, DCA adalah strategi yang paling bijaksana. Sektor ini cenderung memimpin saat ekonomi sedang berekspansi.</li>
+                     <p><strong>Asset Examples (with diversification):</strong></p>
+                    <ul className='list-disc space-y-1 pl-5'>
+                        <li><strong>US Stock Indices (ETFs: VOO/IVV, QQQ):</strong> Instead of picking a single stock, you buy a "basket" of stocks from the 500 or 100 largest companies in the US. The best time to accumulate is periodically (Dollar Cost Averaging/DCA) every month, especially when the market is correcting (down). This is a core strategy used by many successful investors like Warren Buffett.</li>
+                        <li><strong>Digital Assets (Bitcoin, Ethereum):</strong> Have the highest potential return with the highest risk. Allocate a small portion of the portfolio (1-5%). The best time to buy is when the market is "fearful" or after a major decline (bear market), not when everyone is talking about it (bull market peak).</li>
+                        <li><strong>Technology Stock Mutual Funds/Index Funds:</strong> Invest in the sector that drives innovation. Like stock indices, DCA is the most prudent strategy. This sector tends to lead when the economy is expanding.</li>
                     </ul>
                 </div>
             </div>
@@ -302,7 +311,7 @@ function LoadingState() {
                 <Skeleton className="h-20 w-full" />
             </div>
              <Skeleton className="h-4 w-1/2" />
-             <Skeleton className="h-4 w-full" />
+             <Skeleton className="h-2 w-full" />
         </CardContent>
       </Card>
       <Card>
@@ -311,7 +320,7 @@ function LoadingState() {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-[400px] w-full" />
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             <Skeleton className="h-6 w-24" />
             <Skeleton className="h-6 w-24" />
             <Skeleton className="h-6 w-24" />
@@ -323,3 +332,5 @@ function LoadingState() {
     </div>
   );
 }
+
+    
