@@ -52,14 +52,15 @@ export function GrowthChart({ data, visibleLines }: GrowthChartProps) {
             tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
             tickLine={{ stroke: 'hsl(var(--muted-foreground))' }}
             tickFormatter={(value) => {
-              if (typeof value !== 'number') return '';
-              if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-              if (value >= 1e6) return `${(value / 1e6).toFixed(0)}M`;
-              if (value >= 1e3) return `${(value / 1e3).toFixed(0)}K`;
+              if (typeof value !== 'number' || value === 0) return 'Rp 0';
+              if (value >= 1e9) return `${(value / 1e9).toFixed(1)} Miliar`;
+              if (value >= 1e6) return `${(value / 1e6).toFixed(0)} Juta`;
+              if (value >= 1e3) return `${(value / 1e3).toFixed(0)} Ribu`;
               return value.toString();
             }}
           />
           <Tooltip
+            cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             contentStyle={{
               backgroundColor: 'hsl(var(--background))',
               borderColor: 'hsl(var(--border))',
