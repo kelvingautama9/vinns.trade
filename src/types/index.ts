@@ -20,7 +20,6 @@ export type ChartDataPoint = {
 export type Recommendation = {
   type: 'increaseMonthlySavings' | 'increaseReturnRate' | 'extendTimeHorizon';
   value: number;
-  text: string;
 }
 
 export type CalculationResult = {
@@ -33,5 +32,26 @@ export type CalculationResult = {
   isTargetMet: boolean;
   recommendations: Recommendation[];
   realRateIsNegative: boolean;
+  expectedReturnRate: number;
   inflationRate: number;
 };
+
+
+export type RiskRewardInput = {
+    capital: number;
+    riskPerTrade: number;
+    winRate: number;
+    targetProfit?: number;
+    rrTarget?: number;
+}
+
+export type RiskRewardResult = {
+    riskRewardRatio: number;
+    nominalExpectancy: number;
+    expectancyRatio: number;
+    status: "POSITIVE EDGE / VALIDATED" | "NEGATIVE EDGE / HIGH RISK";
+    message: string;
+    riskAmount: number;
+    avgWin: number;
+    winRate: number;
+}

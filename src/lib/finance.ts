@@ -1,6 +1,13 @@
-import type { ChartDataPoint, InvestmentInput, CalculationResult, Recommendation } from '@/types';
+import type { 
+    ChartDataPoint, 
+    InvestmentInput, 
+    CalculationResult, 
+    Recommendation,
+    RiskRewardInput,
+    RiskRewardResult
+} from '@/types';
 
-// --- Helper Functions for Future Value (FV) Calculations ---
+// --- Investment Growth Calculation ---
 
 function calculateFvLumpSum(pv: number, rate: number, periods: number): number {
   return pv * Math.pow(1 + rate, periods);
@@ -25,8 +32,6 @@ function calculateTotalFv(pv: number, pmt: number, rate: number, periods: number
     return fvLumpSum + fvAnnuity;
 }
 
-// --- Recommendation Calculation Helpers ---
-
 function findRequiredMonthlySavings(pv: number, targetFv: number, rate: number, periods: number, type: 'ordinary' | 'due'): number {
     const fvLumpSum = calculateFvLumpSum(pv, rate, periods);
     const requiredFvFromAnnuity = targetFv - fvLumpSum;
@@ -44,24 +49,23 @@ function findRequiredMonthlySavings(pv: number, targetFv: number, rate: number, 
 
 function findRequiredTime(pv: number, pmt: number, targetFv: number, rate: number, type: 'ordinary' | 'due'): number {
     if (calculateTotalFv(pv, pmt, rate, 1, type) >= targetFv) return 1/12;
-    if (rate <= 0 && (pv + pmt) < targetFv) return Infinity; // Cannot reach target if rate is non-positive and we're not already there
+    if (rate <= 0 && (pv + pmt) < targetFv) return Infinity; 
 
     let months = 1;
     while(calculateTotalFv(pv, pmt, rate, months, type) < targetFv) {
-        if (months > 100 * 12) return Infinity; // Safety break for 100 years
+        if (months > 100 * 12) return Infinity; 
         months++;
     }
     return months / 12;
 }
 
 function findRequiredRate(pv: number, pmt: number, targetFv: number, periods: number, type: 'ordinary' | 'due'): number {
-    if (pv + pmt * periods >= targetFv) return 0; // No return needed
+    if (pv + pmt * periods >= targetFv) return 0; 
 
     let low = 0;
-    let high = 1; // Search up to 100% monthly rate, which is an extreme 1200% annual rate.
+    let high = 1; 
     let mid = 0;
     
-    // Iteratively find the monthly rate. Max 100 iterations.
     for(let i=0; i<100; i++) {
         mid = (low + high) / 2;
         const fv = calculateTotalFv(pv, pmt, mid, periods, type);
@@ -73,11 +77,8 @@ function findRequiredRate(pv: number, pmt: number, targetFv: number, periods: nu
             high = mid;
         }
     }
-    return mid * 12; // Convert monthly nominal rate to annual nominal rate
+    return mid * 12;
 }
-
-
-// --- Main Calculation Function ---
 
 export function calculateInvestmentGrowth(
   input: InvestmentInput
@@ -94,14 +95,12 @@ export function calculateInvestmentGrowth(
 
   const annualNominalRate = expectedReturnRate / 100;
   const annualInflationRate = inflationRate / 100;
+  
+  const monthlyNominalRate = annualNominalRate / 12;
   const realRateIsNegative = annualNominalRate <= annualInflationRate;
 
-  // --- Using Nominal Monthly Rate (annual rate / 12) ---
-  const monthlyNominalRate = annualNominalRate / 12;
-
-  // Scenario Rates
-  const conservativeRate = 0.06; // 6%
-  const aggressiveRate = 0.20; // 20%
+  const conservativeRate = 0.06;
+  const aggressiveRate = 0.20; 
   const monthlyConservativeRate = conservativeRate / 12;
   const monthlyAggressiveRate = aggressiveRate / 12;
   
@@ -113,7 +112,6 @@ export function calculateInvestmentGrowth(
     const nominalValue = calculateTotalFv(currentSavings, monthlySavings, monthlyNominalRate, months, annuityType);
     const realValue = nominalValue / Math.pow(1 + annualInflationRate, year);
     
-    // Scenario calculations
     const noInvestment = currentSavings + (monthlySavings * months);
     const conservative = calculateTotalFv(currentSavings, monthlySavings, monthlyConservativeRate, months, annuityType);
     const aggressive = calculateTotalFv(currentSavings, monthlySavings, monthlyAggressiveRate, months, annuityType);
@@ -129,40 +127,33 @@ export function calculateInvestmentGrowth(
   }
 
   const finalNominalValue = chartData[chartData.length - 1].nominalValue;
-  const isTargetMet = finalNominalValue >= targetAmount;
+  const isTargetMet = targetAmount > 0 && finalNominalValue >= targetAmount;
   const totalInvestment = currentSavings + monthlySavings * timeHorizonYears * 12;
   const totalInterest = finalNominalValue - totalInvestment;
 
-  // --- Generate Recommendations if target is not met ---
   const recommendations: Recommendation[] = [];
-  if (!isTargetMet) {
-    // 1. Increase Monthly Savings
+  if (targetAmount > 0 && !isTargetMet) {
     const requiredMonthlySavings = findRequiredMonthlySavings(currentSavings, targetAmount, monthlyNominalRate, timeHorizonYears * 12, annuityType);
     if(requiredMonthlySavings > monthlySavings && isFinite(requiredMonthlySavings)) {
         recommendations.push({
             type: 'increaseMonthlySavings',
             value: requiredMonthlySavings,
-            text: 'Increase monthly savings to reach your goal.'
         });
     }
 
-    // 2. Extend Time Horizon
     const requiredYears = findRequiredTime(currentSavings, monthlySavings, targetAmount, monthlyNominalRate, annuityType);
     if (requiredYears > timeHorizonYears && isFinite(requiredYears)) {
         recommendations.push({
             type: 'extendTimeHorizon',
             value: requiredYears,
-            text: 'Extend your investment time to reach your goal.'
         });
     }
 
-    // 3. Increase Return Rate
     const requiredAnnualRate = findRequiredRate(currentSavings, monthlySavings, targetAmount, timeHorizonYears * 12, annuityType);
      if (requiredAnnualRate > annualNominalRate && isFinite(requiredAnnualRate)) {
         recommendations.push({
             type: 'increaseReturnRate',
             value: requiredAnnualRate * 100,
-            text: 'Find an investment with a higher annual return.'
         });
     }
   }
@@ -177,6 +168,72 @@ export function calculateInvestmentGrowth(
     isTargetMet,
     recommendations,
     realRateIsNegative,
+    expectedReturnRate,
     inflationRate,
   };
+}
+
+
+// --- Risk-Reward Probability Calculation ---
+
+export function calculateRiskRewardProbability(
+  input: RiskRewardInput
+): RiskRewardResult {
+    const { capital, riskPerTrade, winRate, targetProfit, rrTarget } = input;
+
+    if (!capital || !riskPerTrade || !winRate) {
+        throw new Error("Invalid input: Capital, Risk per Trade, and Win Rate are required.");
+    }
+    if(targetProfit === undefined && rrTarget === undefined) {
+        throw new Error("Either Target Profit or R:R Target must be provided.");
+    }
+    if(targetProfit !== undefined && rrTarget !== undefined) {
+        throw new Error("Cannot provide both Target Profit and R:R Target.");
+    }
+
+    const riskAmount = capital * (riskPerTrade / 100);
+    let calculatedTargetProfit: number;
+    let calculatedRR: number;
+
+    // The Reverse Matrix Logic
+    if (targetProfit !== undefined) {
+        calculatedTargetProfit = targetProfit;
+        calculatedRR = targetProfit / riskAmount;
+    } else if (rrTarget !== undefined) {
+        calculatedTargetProfit = riskAmount * rrTarget;
+        calculatedRR = rrTarget;
+    } else {
+        throw new Error("Calculation error: check input logic.");
+    }
+    
+    // Expectancy Formula
+    const Pw = winRate / 100;
+    const Pl = 1 - Pw;
+    const Aw = calculatedTargetProfit;
+    const Al = riskAmount;
+
+    const nominalExpectancy = (Pw * Aw) - (Pl * Al);
+    const expectancyRatio = Al > 0 ? nominalExpectancy / Al : 0;
+    
+    let status: "POSITIVE EDGE / VALIDATED" | "NEGATIVE EDGE / HIGH RISK";
+    let message: string;
+
+    if (nominalExpectancy < 0) {
+        status = "NEGATIVE EDGE / HIGH RISK";
+        message = "This strategy is mathematically expected to lose money over a large number of trades. The system has a negative statistical edge.";
+    } else {
+        status = "POSITIVE EDGE / VALIDATED";
+        message = "The system has a positive statistical probability of profit over a large number of trades. The strategy appears viable.";
+    }
+
+    return {
+        riskRewardRatio: calculatedRR,
+        nominalExpectancy,
+        expectancyRatio,
+        status,
+        message,
+        riskAmount,
+        avgWin: Aw,
+        winRate
+    };
 }
