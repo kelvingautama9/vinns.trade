@@ -26,12 +26,15 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
     nominalExpectancy,
     expectancyRatio,
     status,
-    message,
     riskAmount,
     avgWin,
   } = result;
 
   const isPositive = status === 'POSITIVE EDGE / VALIDATED';
+  const statusTitle = isPositive ? "Strategi Tervalidasi" : "Peringatan: Strategi Berisiko Tinggi";
+  const statusMessage = isPositive
+    ? "Secara statistik, akun Anda diproyeksikan akan tumbuh jika Anda disiplin mengikuti rencana ini."
+    : "Anda diproyeksikan kehilangan uang lebih cepat daripada mendapatkannya. Pertimbangkan untuk memperbesar Target Profit atau memperbaiki Win Rate Anda.";
 
   return (
     <div className="space-y-6">
@@ -45,11 +48,11 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
               isPositive ? "text-green-400" : "text-red-400"
           )}>
             {isPositive ? <CheckCircle2 /> : <XCircle />}
-            {status}
+            {statusTitle}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">{message}</p>
+          <p className="text-muted-foreground">{statusMessage}</p>
         </CardContent>
       </Card>
       
@@ -66,7 +69,7 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
                 <p className="text-2xl font-bold">1 : {riskRewardRatio.toFixed(2)}</p>
             </div>
              <div className="rounded-lg p-4 bg-background/50">
-                <p className="text-sm text-muted-foreground">Nominal Expectancy</p>
+                <p className="text-sm text-muted-foreground">Net Profit per Trade</p>
                 <p className={cn("text-2xl font-bold", isPositive ? "text-green-400" : "text-red-400")}>
                     {formatRupiah(nominalExpectancy)}
                 </p>
@@ -93,20 +96,20 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
                 <div>
                     <h4 className="mb-1 font-semibold text-foreground">The Expectancy Formula: A Breakdown</h4>
                     <p>
-                        The core of this analysis is the expectancy formula: <strong>E = [Win % * Avg. Win] - [Loss % * Avg. Loss]</strong>. In your case:
+                        Inti dari analisis ini adalah rumus ekspektasi: <strong>E = [Win % * Avg. Win] - [Loss % * Avg. Loss]</strong>. Dalam kasus Anda:
                     </p>
                      <ul className="list-disc space-y-1 pl-5">
                        <li><strong>Average Win (Aw):</strong> {formatRupiah(avgWin)}</li>
                         <li><strong>Average Loss (Al):</strong> {formatRupiah(riskAmount)}</li>
                     </ul>
                     <p>
-                        A positive expectancy means that, over a large number of trades, your winning trades will generate more money than your losing trades will lose, leading to net profitability. A negative expectancy indicates a flawed system that is statistically guaranteed to lose money over time.
+                        Ekspektasi positif berarti, dalam jumlah trade yang besar, total keuntungan Anda akan melebihi total kerugian, yang mengarah pada profitabilitas bersih. Ekspektasi negatif menunjukkan sistem yang cacat dan secara statistik dijamin akan kehilangan uang seiring waktu.
                     </p>
                 </div>
                 <div>
                     <h4 className="mb-1 font-semibold text-foreground">Understanding Your "Edge"</h4>
                      <p>
-                        "Edge" is a term used to describe a statistical advantage over the market. Your <strong>Nominal Expectancy</strong> of {formatRupiah(nominalExpectancy)} is the monetary value of your edge per trade. The <strong>Expectancy Ratio</strong> of {(expectancyRatio * 100).toFixed(2)}% tells you the same thing, but as a percentage of your amount risked. For every {formatRupiah(1)} you risk, you can statistically expect to make a profit of {formatRupiah(nominalExpectancy / riskAmount)} over the long run.
+                        "Edge" adalah keunggulan statistik atas pasar. <strong>Net Profit per Trade</strong> Anda sebesar {formatRupiah(nominalExpectancy)} adalah nilai moneter dari edge Anda per transaksi. <strong>Rasio Ekspektasi</strong> sebesar {(expectancyRatio * 100).toFixed(2)}% memberitahu hal yang sama, tetapi sebagai persentase dari modal yang Anda risikokan. Untuk setiap {formatRupiah(1)} yang Anda pertaruhkan, Anda secara statistik dapat mengharapkan keuntungan sebesar {formatRupiah(nominalExpectancy / riskAmount)} dalam jangka panjang.
                     </p>
                 </div>
             </div>
@@ -124,17 +127,18 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
             <div className="prose prose-sm dark:prose-invert max-w-none space-y-4 text-muted-foreground">
                 <div>
                     <p>
-                        Hedge funds and proprietary trading firms live and die by expectancy. No strategy is deployed with institutional capital unless it demonstrates a persistent positive edge, even if it's small.
+                        Hedge fund dan firma trading profesional hidup dan mati berdasarkan ekspektasi. Tidak ada strategi yang digunakan dengan modal institusional kecuali menunjukkan *edge* positif yang persisten, sekecil apa pun itu.
                     </p>
                     <p>
-                        A key metric is the relationship between Win Rate and Risk:Reward Ratio. A system does not need a high win rate to be profitable. For example:
+                        Kunci utamanya adalah hubungan antara Win Rate dan Risk:Reward Ratio. Banyak trader pemula mengejar Win Rate tinggi, tetapi profesional memahami bahwa profitabilitas adalah keseimbangan.
                     </p>
                      <ul className='list-disc space-y-1 pl-5'>
-                        <li><strong>Trend Following Systems:</strong> Often have low win rates (30-40%) but very high R:R ratios (1:5, 1:10, or more). They lose small on many trades but capture massive wins on a few, resulting in a strong positive expectancy.</li>
-                        <li><strong>Mean Reversion Systems:</strong> Typically have high win rates (60-80%) but low R:R ratios (often less than 1:1). They make many small, consistent profits, but must carefully manage the few large losses that can erase gains.</li>
+                        <li><strong>Trader Retail (Pemula):</strong> Seringkali memiliki Win Rate di bawah 50% karena keputusan emosional. Jika Anda tidak yakin dengan Win Rate Anda, 50% adalah titik awal yang adil. Tujuannya adalah untuk secara konsisten berada di atas angka ini.</li>
+                        <li><strong>Trader Profesional:</strong> Win Rate 55-60% dianggap sangat baik untuk banyak strategi (misalnya, *day trading*), selama R:R dikelola dengan baik.</li>
+                        <li><strong>Sistem Institusional (contoh: *Trend Following*):</strong> Seringkali memiliki Win Rate rendah (30-40%) tetapi R:R sangat tinggi (1:5, 1:10, atau lebih). Mereka merugi kecil pada banyak trade tetapi menangkap keuntungan masif pada beberapa trade, menghasilkan ekspektasi positif yang kuat.</li>
                     </ul>
                     <p>
-                        Your strategy, with a {result.winRate}% win rate and a 1:{riskRewardRatio.toFixed(2)} R:R, fits into a specific profile. The goal is not just to have a positive expectancy, but to understand its characteristics to manage your psychology and capital allocation effectively.
+                        Strategi Anda, dengan Win Rate {result.winRate}% dan R:R 1:{riskRewardRatio.toFixed(2)}, memiliki profil tertentu. Tujuannya bukan hanya untuk memiliki ekspektasi positif, tetapi untuk memahami karakteristiknya agar dapat mengelola psikologi dan alokasi modal Anda secara efektif.
                     </p>
                 </div>
             </div>
