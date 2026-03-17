@@ -24,26 +24,25 @@ export function formatCurrency(amount: number, currency: Currency): string {
     
     const locale = currency === 'IDR' ? 'id-ID' : 'en-US';
     
-    // In the browser, this will work as expected.
-    // In Node.js (during SSR), you might need to ensure the full ICU data is available.
     return new Intl.NumberFormat(locale, options).format(amount);
 }
   
-export function parseCurrency(formattedAmount: string, currency: Currency): number {
-    if (!formattedAmount || typeof formattedAmount !== 'string') return 0;
+export function parseCurrency(value: string, currency: Currency): number {
+  if (typeof value !== 'string') return 0;
+  
+  // Remove currency symbols, spaces, and grouping separators.
+  let cleanValue = value
+    .replace(/^(Rp|\$)\s*/, '')
+    .trim();
 
-    let numericString: string;
+  if (currency === 'IDR') {
+    // In 'id-ID' locale, '.' is a grouping separator.
+    cleanValue = cleanValue.replace(/\./g, '');
+  } else { // USD
+    // In 'en-US' locale, ',' is a grouping separator.
+    cleanValue = cleanValue.replace(/,/g, '');
+  }
 
-    if (currency === 'IDR') {
-        // For IDR, dots are thousands separators, and there are no decimals by our formatter.
-        // We just need to remove non-digit characters.
-        numericString = formattedAmount.replace(/[^0-9]/g, '');
-    } else { // USD
-        // For USD, remove commas, but keep the dot. This assumes a single dot is the decimal separator.
-        // This won't handle international formats well, but is fine for `en-US` locale.
-        numericString = formattedAmount.replace(/,/g, '');
-    }
-    
-    const parsed = parseFloat(numericString);
-    return isNaN(parsed) ? 0 : parsed;
+  const parsed = parseFloat(cleanValue);
+  return isNaN(parsed) ? 0 : parsed;
 }

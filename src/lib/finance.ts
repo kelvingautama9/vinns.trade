@@ -182,7 +182,7 @@ export function calculatePositionSizing(
   input: PositionSizingInput
 ): PositionSizingResult {
   const {
-    margin,
+    accountBalance,
     entryPrice,
     stopLossPrice,
     takeProfitPrice,
@@ -232,7 +232,7 @@ export function calculatePositionSizing(
       return {
           trades,
           lossAmount,
-          remainingCapital: margin - lossAmount
+          remainingCapital: accountBalance - lossAmount
       };
   });
 
@@ -245,6 +245,6 @@ export function calculatePositionSizing(
     series40wr,
     series50wr,
     drawdownSeries,
-    margin,
+    accountBalance,
   };
 }

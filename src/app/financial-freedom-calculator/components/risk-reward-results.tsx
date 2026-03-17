@@ -5,7 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, cn } from '@/lib/utils';
-import { Scale, ShieldCheck, TrendingUp, ShieldAlert, BarChart, ArrowUp, ArrowDown, Target, Calculator, PieChart, ShieldX } from 'lucide-react';
+import { Scale, ShieldCheck, TrendingUp, ShieldAlert, BarChart, ArrowUp, ArrowDown, Target, Calculator, PieChart, ShieldX, AlertTriangle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type RiskRewardResultsProps = {
@@ -32,7 +32,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
     series40wr,
     series50wr,
     drawdownSeries,
-    margin
+    accountBalance
   } = result;
 
   const isHealthy = rrRatio >= 2;
@@ -146,7 +146,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
               <TableRow>
                 <TableHead>Consecutive Losses</TableHead>
                 <TableHead>Total Loss</TableHead>
-                <TableHead className="text-right">Remaining Margin</TableHead>
+                <TableHead className="text-right">Remaining Balance</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -154,7 +154,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
                 <TableRow key={drawdown.trades}>
                   <TableCell>{drawdown.trades} Trades</TableCell>
                   <TableCell className="text-red-400">{formatCurrency(drawdown.lossAmount, currency)}</TableCell>
-                  <TableCell className={cn("text-right font-semibold", drawdown.remainingCapital < margin * 0.5 ? "text-red-400" : "text-foreground" )}>
+                  <TableCell className={cn("text-right font-semibold", drawdown.remainingCapital < accountBalance * 0.5 ? "text-red-400" : "text-foreground" )}>
                     {drawdown.remainingCapital > 0 ? formatCurrency(drawdown.remainingCapital, currency) : `-${formatCurrency(Math.abs(drawdown.remainingCapital), currency)}`}
                   </TableCell>
                 </TableRow>
