@@ -61,7 +61,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
     recommendations,
     realRateIsNegative,
     inflationRate,
-    expectedReturnRate
+    expectedReturnRate,
   } = result;
 
   const shortfall = targetAmount - finalNominalValue;
@@ -72,10 +72,10 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {!isTargetMet && (
-        <Alert variant="destructive" className="border-amber-500/30 bg-amber-900/20">
+        <Alert className="border-amber-500/50 bg-amber-500/10">
           <Frown className="h-4 w-4 text-amber-400" />
           <AlertTitle className="text-amber-300">Strategy Needs Adjustment</AlertTitle>
-          <AlertDescription className="text-amber-400">
+          <AlertDescription className="text-amber-400/90">
             Your current strategy may not be enough to reach your financial goal. Consider the recommendations below.
           </AlertDescription>
         </Alert>
