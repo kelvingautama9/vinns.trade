@@ -5,7 +5,7 @@ import type {NextConfig} from 'next';
 // Contoh: jika URL repo Anda adalah https://github.com/user/my-trading-app,
 // maka isi variabel di bawah ini dengan 'my-trading-app'.
 // =================================================================================
-const repositoryName = '<YOUR_REPOSITORY_NAME>';
+const repositoryName = '<vinns.trade>';
 
 const isGithubActions = process.env.GITHUB_ACTIONS || false;
 
