@@ -30,18 +30,7 @@ const formSchema = z.object({
   capital: z.string().refine(val => parseRupiah(val) > 0, {message: "Capital must be greater than 0"}),
   riskPerTrade: z.coerce.number().min(0.1).max(100),
   winRate: z.coerce.number().min(0).max(100),
-  targetProfit: z.string().optional(),
-  rrTarget: z.string().optional(),
-}).refine(data => {
-    return !!data.targetProfit || !!data.rrTarget;
-}, {
-    message: "Either Target Profit or R:R Target must be provided.",
-    path: ["targetProfit"], 
-}).refine(data => {
-    return !(data.targetProfit && data.rrTarget);
-}, {
-    message: "Cannot provide both Target Profit and R:R Target. The logic is reverse-engineered.",
-    path: ["rrTarget"],
+  riskRewardRatio: z.coerce.number({invalid_type_error: "R:R Ratio is required."}).min(0.1, {message: "R:R ratio must be at least 0.1."}),
 });
 
 
@@ -57,8 +46,7 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
       capital: 'Rp 100.000.000',
       riskPerTrade: 1,
       winRate: 50,
-      targetProfit: '',
-      rrTarget: '2',
+      riskRewardRatio: 2,
     },
   });
 
@@ -74,12 +62,11 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
         capital: parseRupiah(values.capital),
         riskPerTrade: values.riskPerTrade,
         winRate: values.winRate,
-        targetProfit: values.targetProfit ? parseRupiah(values.targetProfit) : undefined,
-        rrTarget: values.rrTarget ? parseFloat(values.rrTarget) : undefined,
+        riskRewardRatio: values.riskRewardRatio,
     });
   }
 
-  const handleRupiahChange = (field: "capital" | "targetProfit") => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRupiahChange = (field: "capital") => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const numberValue = parseRupiah(value);
     form.setValue(field, formatRupiah(numberValue));
@@ -102,37 +89,17 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
                     </FormItem>
                 )}
             />
-             <FormField
-                control={form.control}
-                name="targetProfit"
-                render={({ field }) => (
-                    <FormItem>
-                    <FormLabel>Target Profit (Optional)</FormLabel>
-                    <FormControl>
-                        <Input 
-                            {...field} 
-                            value={field.value ?? ''}
-                            onChange={handleRupiahChange("targetProfit")} 
-                            onBlur={field.onBlur}
-                            placeholder="e.g., Rp 5.000.000"
-                        />
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
-            />
             <FormField
                 control={form.control}
-                name="rrTarget"
+                name="riskRewardRatio"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>R:R Target (e.g., 2 for 1:2)</FormLabel>
+                    <FormLabel>Risk:Reward Ratio (e.g., 2 for 1:2)</FormLabel>
                     <FormControl>
                          <Input 
                             type="number"
                             {...field}
-                            value={field.value ?? ''}
-                            onChange={(e) => field.onChange(e.target.value)}
+                            onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                             placeholder="e.g., 2.5"
                             step="0.1"
                         />
@@ -162,6 +129,7 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
                   <Input
                     type="number"
                     {...field}
+                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                     className="w-24 text-center"
                     min={0.1}
                     max={10}
@@ -178,7 +146,7 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
             name="winRate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Historical Win Rate (%)</FormLabel>
+                <FormLabel>Projected Win Rate (%)</FormLabel>
                 <Select
                     onValueChange={(value) => field.onChange(parseInt(value, 10))}
                     value={String(field.value)}
@@ -215,7 +183,7 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
                     value={field.value}
                     onChange={e => {
                         const value = e.target.value;
-                        field.onChange(value === '' ? 0 : Number(value));
+                        field.onChange(value === '' ? '' : Number(value));
                     }}
                     className="w-24 text-center"
                     min={1}
@@ -235,7 +203,7 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
               Calculating Expectancy...
             </>
           ) : (
-            'Calculate'
+            'Validate Strategy'
           )}
         </Button>
       </form>

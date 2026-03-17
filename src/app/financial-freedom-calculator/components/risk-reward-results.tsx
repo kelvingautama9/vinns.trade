@@ -31,16 +31,16 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
   } = result;
 
   const isPositive = status === 'POSITIVE EDGE / VALIDATED';
-  const statusTitle = isPositive ? "Strategi Tervalidasi" : "Peringatan: Strategi Berisiko Tinggi";
+  const statusTitle = isPositive ? "Aman: Strategi ini sehat." : "Peringatan: Strategi ini berbahaya.";
   const statusMessage = isPositive
-    ? "Secara statistik, akun Anda diproyeksikan akan tumbuh jika Anda disiplin mengikuti rencana ini."
-    : "Anda diproyeksikan kehilangan uang lebih cepat daripada mendapatkannya. Pertimbangkan untuk memperbesar Target Profit atau memperbaiki Win Rate Anda.";
+    ? "Secara statistik, akun Anda akan tumbuh jika disiplin mengikuti rencana ini."
+    : "Anda kehilangan uang lebih cepat daripada mendapatkannya. Perbesar Risk:Reward Ratio atau perbaiki akurasi Win Rate Anda.";
 
   return (
     <div className="space-y-6">
       <Card className={cn(
           "border-2",
-          isPositive ? "border-green-500/50 bg-green-500/10" : "border-red-500/50 bg-red-500/10"
+          isPositive ? "border-green-500/50 bg-green-900/20" : "border-red-500/50 bg-red-900/20"
       )}>
         <CardHeader>
           <CardTitle className={cn(
@@ -68,7 +68,7 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
                 <p className="text-sm text-muted-foreground">Risk:Reward Ratio</p>
                 <p className="text-2xl font-bold">1 : {riskRewardRatio.toFixed(2)}</p>
             </div>
-             <div className="rounded-lg p-4 bg-background/50">
+             <div className="rounded-lg p-4 bg-background/50 ring-2 ring-primary/50">
                 <p className="text-sm text-muted-foreground">Net Profit per Trade</p>
                 <p className={cn("text-2xl font-bold", isPositive ? "text-green-400" : "text-red-400")}>
                     {formatRupiah(nominalExpectancy)}
@@ -99,8 +99,8 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
                         Inti dari analisis ini adalah rumus ekspektasi: <strong>E = [Win % * Avg. Win] - [Loss % * Avg. Loss]</strong>. Dalam kasus Anda:
                     </p>
                      <ul className="list-disc space-y-1 pl-5">
-                       <li><strong>Average Win (Aw):</strong> {formatRupiah(avgWin)}</li>
-                        <li><strong>Average Loss (Al):</strong> {formatRupiah(riskAmount)}</li>
+                       <li><strong>Average Win (Aw):</strong> {formatRupiah(avgWin)} (Risk Amount * R:R Ratio)</li>
+                        <li><strong>Average Loss (Al):</strong> {formatRupiah(riskAmount)} (Capital * Risk %)</li>
                     </ul>
                     <p>
                         Ekspektasi positif berarti, dalam jumlah trade yang besar, total keuntungan Anda akan melebihi total kerugian, yang mengarah pada profitabilitas bersih. Ekspektasi negatif menunjukkan sistem yang cacat dan secara statistik dijamin akan kehilangan uang seiring waktu.
@@ -154,9 +154,9 @@ function InitialState() {
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
         <BarChart className="h-8 w-8 text-muted-foreground" />
       </div>
-      <h3 className="mt-4 text-xl font-semibold">Risk-Reward Probability Engine</h3>
+      <h3 className="mt-4 text-xl font-semibold">Strategy Validator</h3>
       <p className="mt-1 text-muted-foreground">
-        Input your trading parameters to analyze the statistical expectancy of your strategy.
+        Input your trading parameters to validate the statistical expectancy of your strategy.
       </p>
     </div>
   );

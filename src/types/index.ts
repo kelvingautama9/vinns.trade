@@ -41,8 +41,7 @@ export type RiskRewardInput = {
     capital: number;
     riskPerTrade: number;
     winRate: number;
-    targetProfit?: number;
-    rrTarget?: number;
+    riskRewardRatio: number;
 }
 
 export type RiskRewardResult = {

@@ -179,40 +179,22 @@ export function calculateInvestmentGrowth(
 export function calculateRiskRewardProbability(
   input: RiskRewardInput
 ): RiskRewardResult {
-    const { capital, riskPerTrade, winRate, targetProfit, rrTarget } = input;
+    const { capital, riskPerTrade, winRate, riskRewardRatio } = input;
 
-    if (!capital || !riskPerTrade || !winRate) {
-        throw new Error("Invalid input: Capital, Risk per Trade, and Win Rate are required.");
+    if (!capital || !riskPerTrade || !winRate || !riskRewardRatio) {
+        throw new Error("Invalid input: Capital, Risk per Trade, Win Rate, and R:R Ratio are required.");
     }
-    if(targetProfit === undefined && rrTarget === undefined) {
-        throw new Error("Either Target Profit or R:R Target must be provided.");
-    }
-    if(targetProfit !== undefined && rrTarget !== undefined) {
-        throw new Error("Cannot provide both Target Profit and R:R Target.");
-    }
-
+    
+    // Core Calculations
     const riskAmount = capital * (riskPerTrade / 100);
-    let calculatedTargetProfit: number;
-    let calculatedRR: number;
-
-    // The Reverse Matrix Logic
-    if (targetProfit !== undefined) {
-        calculatedTargetProfit = targetProfit;
-        calculatedRR = targetProfit / riskAmount;
-    } else if (rrTarget !== undefined) {
-        calculatedTargetProfit = riskAmount * rrTarget;
-        calculatedRR = rrTarget;
-    } else {
-        throw new Error("Calculation error: check input logic.");
-    }
+    const avgWin = riskAmount * riskRewardRatio;
     
     // Expectancy Formula
     const Pw = winRate / 100;
     const Pl = 1 - Pw;
-    const Aw = calculatedTargetProfit;
     const Al = riskAmount;
 
-    const nominalExpectancy = (Pw * Aw) - (Pl * Al);
+    const nominalExpectancy = (Pw * avgWin) - (Pl * Al);
     const expectancyRatio = Al > 0 ? nominalExpectancy / Al : 0;
     
     let status: "POSITIVE EDGE / VALIDATED" | "NEGATIVE EDGE / HIGH RISK";
@@ -227,13 +209,13 @@ export function calculateRiskRewardProbability(
     }
 
     return {
-        riskRewardRatio: calculatedRR,
+        riskRewardRatio: riskRewardRatio,
         nominalExpectancy,
         expectancyRatio,
         status,
         message,
         riskAmount,
-        avgWin: Aw,
+        avgWin: avgWin,
         winRate
     };
 }
