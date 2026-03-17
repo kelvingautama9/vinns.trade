@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, TrendingUp, Goal, Briefcase } from 'lucide-react';
+import { Menu, TrendingUp, Briefcase, ClipboardList } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sheet,
@@ -31,9 +31,9 @@ export const mainNav: NavItem[] = [
     icon: TrendingUp,
   },
   {
-    title: 'Financial Freedom Calc',
+    title: 'Trading Plan',
     href: '/financial-freedom-calculator',
-    icon: Goal,
+    icon: ClipboardList,
   },
 ];
 

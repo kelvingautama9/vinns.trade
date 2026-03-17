@@ -29,14 +29,13 @@ export default function Home() {
             </Button>
             <Button asChild variant="outline" size="lg">
               <Link href="/financial-freedom-calculator">
-                Freedom Calculator
+                Trading Plan
               </Link>
             </Button>
           </div>
         </div>
         <div className="hidden h-full items-center justify-center md:flex">
           <div className="relative h-full w-full">
-            <div className="absolute -left-4 -top-4 h-48 w-48 rounded-full bg-primary/10 blur-2xl"></div>
             <div className="relative z-10 flex h-[400px] w-full items-center justify-center rounded-2xl border bg-card/50 p-8 shadow-lg backdrop-blur-sm">
                 <div className="flex flex-col items-center text-center">
                     <svg
