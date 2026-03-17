@@ -127,15 +127,13 @@ export function RiskRewardResults({ result, isLoading }: RiskRewardResultsProps)
             <div className="prose prose-sm dark:prose-invert max-w-none space-y-4 text-muted-foreground">
                 <div>
                     <p>
-                        Hedge fund dan firma trading profesional hidup dan mati berdasarkan ekspektasi. Tidak ada strategi yang digunakan dengan modal institusional kecuali menunjukkan *edge* positif yang persisten, sekecil apa pun itu.
-                    </p>
-                    <p>
-                        Kunci utamanya adalah hubungan antara Win Rate dan Risk:Reward Ratio. Banyak trader pemula mengejar Win Rate tinggi, tetapi profesional memahami bahwa profitabilitas adalah keseimbangan.
+                        Hedge fund dan firma trading profesional hidup dan mati berdasarkan ekspektasi. Tidak ada strategi yang digunakan dengan modal institusional kecuali menunjukkan *edge* positif yang persisten, sekecil apa pun itu. Kunci utamanya adalah hubungan antara Win Rate dan Risk:Reward Ratio.
                     </p>
                      <ul className='list-disc space-y-1 pl-5'>
-                        <li><strong>Trader Retail (Pemula):</strong> Seringkali memiliki Win Rate di bawah 50% karena keputusan emosional. Jika Anda tidak yakin dengan Win Rate Anda, 50% adalah titik awal yang adil. Tujuannya adalah untuk secara konsisten berada di atas angka ini.</li>
-                        <li><strong>Trader Profesional:</strong> Win Rate 55-60% dianggap sangat baik untuk banyak strategi (misalnya, *day trading*), selama R:R dikelola dengan baik.</li>
-                        <li><strong>Sistem Institusional (contoh: *Trend Following*):</strong> Seringkali memiliki Win Rate rendah (30-40%) tetapi R:R sangat tinggi (1:5, 1:10, atau lebih). Mereka merugi kecil pada banyak trade tetapi menangkap keuntungan masif pada beberapa trade, menghasilkan ekspektasi positif yang kuat.</li>
+                        <li><strong>Fair Game (Baseline):</strong> Ini adalah titik awal 50%, di mana peluang menang dan kalah seimbang. Strategi Anda harus memiliki ekspektasi positif dari titik ini untuk dianggap layak.</li>
+                        <li><strong>Retail Beginner:</strong> Profil ini seringkali beroperasi dengan Win Rate di bawah 50% karena faktor emosional. Profil ini menetapkan Win Rate ke 45% sebagai skenario realistis.</li>
+                        <li><strong>Professional Trader:</strong> Trader yang disiplin mencapai Win Rate antara 55-60% pada strategi seperti *day trading*. Profil ini menggunakan 58% sebagai acuan.</li>
+                        <li><strong>Institutional System:</strong> Sistem trading besar (seperti *Trend Following*) seringkali memiliki Win Rate rendah (30-40%) tetapi R:R sangat besar (1:5, 1:10, atau lebih) untuk mengimbanginya. Profil ini menggunakan 35%.</li>
                     </ul>
                     <p>
                         Strategi Anda, dengan Win Rate {result.winRate}% dan R:R 1:{riskRewardRatio.toFixed(2)}, memiliki profil tertentu. Tujuannya bukan hanya untuk memiliki ekspektasi positif, tetapi untuk memahami karakteristiknya agar dapat mengelola psikologi dan alokasi modal Anda secara efektif.

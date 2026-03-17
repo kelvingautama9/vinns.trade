@@ -17,7 +17,13 @@ import { Slider } from '@/components/ui/slider';
 import type { RiskRewardInput } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { formatRupiah, parseRupiah } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 
 const formSchema = z.object({
@@ -55,6 +61,13 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
       rrTarget: '2',
     },
   });
+
+  const traderProfiles = [
+      { name: 'Retail Beginner', value: 45, description: 'Struggles with consistency (sub-50% WR).' },
+      { name: 'Fair Game (Baseline)', value: 50, description: 'A 50/50 break-even starting point.' },
+      { name: 'Professional Trader', value: 58, description: 'Disciplined with a consistent edge (55-60% WR).' },
+      { name: 'Institutional System', value: 35, description: 'Low WR (30-40%), but very high R:R.' },
+  ];
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     onCalculate({
@@ -166,8 +179,28 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Historical Win Rate (%)</FormLabel>
-                 <div className="flex items-center gap-4">
-                  <FormControl>
+                <Select
+                    onValueChange={(value) => field.onChange(parseInt(value, 10))}
+                    value={String(field.value)}
+                >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a profile to set a win rate..." />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                       {traderProfiles.map((profile) => (
+                          <SelectItem key={profile.name} value={String(profile.value)}>
+                            <div>
+                               <p className="font-semibold">{profile.name} ({profile.value}%)</p>
+                               <p className="text-xs text-muted-foreground">{profile.description}</p>
+                            </div>
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className="flex items-center gap-4 pt-2">
+                   <FormControl>
                     <Slider
                       min={1}
                       max={99}
@@ -179,7 +212,11 @@ export function RiskRewardForm({ onCalculate, isLoading }: RiskRewardFormProps) 
                   </FormControl>
                   <Input
                     type="number"
-                    {...field}
+                    value={field.value}
+                    onChange={e => {
+                        const value = e.target.value;
+                        field.onChange(value === '' ? 0 : Number(value));
+                    }}
                     className="w-24 text-center"
                     min={1}
                     max={99}
