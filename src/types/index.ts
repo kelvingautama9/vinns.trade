@@ -40,10 +40,10 @@ export type Currency = 'IDR' | 'USD';
 
 export type PositionSizingInput = {
     accountBalance: number;
+    positionValue: number;
     entryPrice: number;
     stopLossPrice: number;
     takeProfitPrice: number;
-    maxRiskNominal: number;
 };
 
 export type ScenarioResult = {

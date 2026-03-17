@@ -28,10 +28,10 @@ const parsePlainNumber = (value: string | number): number => {
 
 const formSchema = z.object({
   accountBalance: z.string().refine(val => parseCurrency(val, 'IDR') >= 0, {message: "Account Balance must be a positive number"}),
+  positionValue: z.string().refine(val => parseCurrency(val, 'IDR') > 0, {message: "Position Value must be a positive number"}),
   entryPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Entry Price must be a positive number"}),
   takeProfitPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Take Profit must be a positive number"}),
   stopLossPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Stop Loss must be a positive number"}),
-  maxRiskNominal: z.string().refine(val => parseCurrency(val, 'IDR') > 0, {message: "Max Risk must be a positive number"}),
 }).refine(data => parsePlainNumber(data.entryPrice) > parsePlainNumber(data.stopLossPrice), {
     message: "Stop Loss must be below Entry Price for a long trade.",
     path: ["stopLossPrice"],
@@ -52,29 +52,25 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
     resolver: zodResolver(formSchema),
     defaultValues: {
       accountBalance: formatCurrency(0, currency),
+      positionValue: formatCurrency(0, currency),
       entryPrice: '0',
       takeProfitPrice: '0',
       stopLossPrice: '0',
-      maxRiskNominal: formatCurrency(0, currency),
     },
     mode: 'onChange',
   });
 
-  const accountBalanceValue = parseCurrency(form.watch('accountBalance'), currency);
-  const maxRiskValue = parseCurrency(form.watch('maxRiskNominal'), currency);
-  const riskPercent = accountBalanceValue > 0 ? (maxRiskValue / accountBalanceValue) * 100 : 0;
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     onCalculate({
         accountBalance: parseCurrency(values.accountBalance, currency),
+        positionValue: parseCurrency(values.positionValue, currency),
         entryPrice: parsePlainNumber(values.entryPrice),
         stopLossPrice: parsePlainNumber(values.stopLossPrice),
         takeProfitPrice: parsePlainNumber(values.takeProfitPrice),
-        maxRiskNominal: parseCurrency(values.maxRiskNominal, currency),
     });
   }
 
-  const handleCurrencyInput = (field: "accountBalance" | "maxRiskNominal", value: string) => {
+  const handleCurrencyInput = (field: "accountBalance" | "positionValue", value: string) => {
     const numValue = parseCurrency(value, currency);
     form.setValue(field, formatCurrency(numValue, currency), { shouldValidate: true });
   };
@@ -90,10 +86,10 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
     
     const currentAccountBalance = parseCurrency(values.accountBalance, oldCurrency);
     form.setValue('accountBalance', formatCurrency(currentAccountBalance, currency));
-    
-    const currentMaxRisk = parseCurrency(values.maxRiskNominal, oldCurrency);
-    form.setValue('maxRiskNominal', formatCurrency(currentMaxRisk, currency));
 
+    const currentPositionValue = parseCurrency(values.positionValue, oldCurrency);
+    form.setValue('positionValue', formatCurrency(currentPositionValue, currency));
+    
   }, [currency, form]);
 
 
@@ -140,6 +136,20 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
             />
             <FormField
                 control={form.control}
+                name="positionValue"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Position Value</FormLabel>
+                        <p className="text-xs text-muted-foreground -mt-1.5">The total nominal value of the asset you want to buy.</p>
+                        <FormControl>
+                            <Input {...field} onChange={(e) => handleCurrencyInput("positionValue", e.target.value)} onBlur={field.onBlur} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
                 name="entryPrice"
                 render={({ field }) => (
                     <FormItem>
@@ -175,27 +185,6 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <p className="text-xs text-muted-foreground -mt-1.5">The price at which you will exit to prevent further losses.</p>
                         <FormControl>
                             <Input type="text" {...field} onChange={(e) => handleNumberInput("stopLossPrice", e.target.value)} onBlur={field.onBlur} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                control={form.control}
-                name="maxRiskNominal"
-                render={({ field }) => (
-                    <FormItem>
-                        <div className="flex justify-between items-center">
-                            <FormLabel>Max Risk per Trade</FormLabel>
-                            {accountBalanceValue > 0 && maxRiskValue > 0 && (
-                                <span className="text-xs font-medium text-muted-foreground">
-                                    {riskPercent.toFixed(2)}% of Balance
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-xs text-muted-foreground -mt-1.5">The max amount of capital you are willing to lose on this trade.</p>
-                        <FormControl>
-                            <Input {...field} onChange={(e) => handleCurrencyInput("maxRiskNominal", e.target.value)} onBlur={field.onBlur} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

@@ -44,6 +44,8 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
     return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(size);
   }
 
+  const riskPercent = accountBalance > 0 ? (potentialLoss / accountBalance) * 100 : 0;
+
   return (
     <div className="space-y-6">
       {isBadTrade && (
@@ -81,7 +83,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
                 <div className="rounded-lg p-4 bg-background/50">
                     <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><ArrowDown className="text-red-500"/> If Wrong (Loss)</p>
                     <p className="text-2xl font-bold text-red-400">{formatCurrency(potentialLoss, currency)}</p>
-                    <p className="text-xs text-muted-foreground">(Your Max Risk)</p>
+                    <p className="text-xs text-muted-foreground">({riskPercent.toFixed(2)}% of Balance)</p>
                 </div>
             </div>
              <div className="rounded-lg p-4 bg-background/50 text-center">
@@ -100,14 +102,14 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
         </CardHeader>
         <CardContent className="space-y-4 text-center">
             <div>
-                <p className="text-sm text-muted-foreground">Allowed Units/Lots to Buy</p>
+                <p className="text-sm text-muted-foreground">Position Size (Units/Lots)</p>
                 <p className="text-4xl font-extrabold text-primary">{formatPositionSize(positionSize)}</p>
             </div>
             <div>
                 <p className="text-sm text-muted-foreground flex items-center justify-center gap-2"><Wallet /> Total Position Value</p>
                 <p className="text-xl font-bold">{formatCurrency(totalPositionValue, currency)}</p>
             </div>
-            <p className="text-xs text-muted-foreground pt-2">Based on your max risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade to protect your capital.</p>
+            <p className="text-xs text-muted-foreground pt-2">This is your calculated position based on the value you entered. The resulting risk for this trade is <strong>{formatCurrency(potentialLoss, currency)}</strong>.</p>
         </CardContent>
       </Card>
 
@@ -144,7 +146,7 @@ export function RiskRewardResults({ result, isLoading, currency }: RiskRewardRes
             </TableBody>
           </Table>
           <p className="text-xs text-muted-foreground pt-3">
-            Simulation assumes each of the 10 trades uses the same risk amount of <strong>{formatCurrency(potentialLoss, currency)}</strong>. With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.
+            Simulation assumes each of the 10 trades has the same parameters, resulting in a consistent risk of <strong>{formatCurrency(potentialLoss, currency)}</strong> per trade. With this R:R, you only need a <strong>{breakevenWinRate.toFixed(2)}%</strong> win rate to break even.
           </p>
         </CardContent>
       </Card>

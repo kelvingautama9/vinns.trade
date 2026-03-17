@@ -183,17 +183,16 @@ export function calculatePositionSizing(
 ): PositionSizingResult {
   const {
     accountBalance,
+    positionValue,
     entryPrice,
     stopLossPrice,
     takeProfitPrice,
-    maxRiskNominal,
   } = input;
 
-  if (maxRiskNominal <= 0) {
-      throw new Error("Max Risk must be greater than 0.");
+  if (entryPrice <= 0) {
+      throw new Error("Entry Price must be greater than 0.");
   }
 
-  // 1. Calculate distances
   const tpDistance = Math.abs(takeProfitPrice - entryPrice);
   const clDistance = Math.abs(entryPrice - stopLossPrice);
 
@@ -204,22 +203,17 @@ export function calculatePositionSizing(
     throw new Error("Entry Price and Take Profit Price must not be the same or have Take Profit below Entry.");
   }
 
-
-  // 2. Calculate RR Ratio
-  const rrRatio = tpDistance / clDistance;
-
-  // 3. Calculate Position Size based on nominal risk
-  const positionSize = maxRiskNominal / clDistance;
-  const totalPositionValue = positionSize * entryPrice;
-
-  // 4. Calculate Potential Profit & Loss
+  const positionSize = positionValue / entryPrice;
+  const potentialLoss = positionSize * clDistance;
   const potentialProfit = positionSize * tpDistance;
-  const potentialLoss = positionSize * clDistance; // Should equal maxRiskNominal
+  
+  if (potentialLoss <= 0) {
+       throw new Error("Calculated risk is zero or negative. Please check your inputs.");
+  }
 
-  // 5. Calculate Breakeven Win Rate for psychological context
+  const rrRatio = potentialProfit / potentialLoss;
   const breakevenWinRate = (1 / (1 + rrRatio)) * 100;
   
-  // 6. "The Series of 10 Trades" Simulation
   const series40wr: ScenarioResult = {
       wins: 4,
       losses: 6,
@@ -235,9 +229,8 @@ export function calculatePositionSizing(
       netOutcome: (5 * potentialProfit) - (5 * potentialLoss)
   };
 
-  // 7. Drawdown Simulation
   const drawdownSeries: DrawdownResult[] = [3, 5, 10].map(trades => {
-      const lossAmount = trades * maxRiskNominal;
+      const lossAmount = trades * potentialLoss;
       return {
           trades,
           lossAmount,
@@ -255,6 +248,6 @@ export function calculatePositionSizing(
     series50wr,
     drawdownSeries,
     accountBalance,
-    totalPositionValue,
+    totalPositionValue: positionValue,
   };
 }
