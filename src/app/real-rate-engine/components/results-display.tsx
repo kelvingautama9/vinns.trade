@@ -39,7 +39,7 @@ const lineNames: Record<string, string> = {
 export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   const [visibleLines, setVisibleLines] = useState(initialVisibleLines);
 
-  const handleLineVisibilityChange = (key: string) => {
+  const handleLineVisibilityChange = (key: keyof typeof initialVisibleLines) => {
     setVisibleLines(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -147,7 +147,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                 <Checkbox
                   id={key}
                   checked={visibleLines[key as keyof typeof initialVisibleLines]}
-                  onCheckedChange={() => handleLineVisibilityChange(key)}
+                  onCheckedChange={() => handleLineVisibilityChange(key as keyof typeof initialVisibleLines)}
                 />
                 <Label htmlFor={key} className="cursor-pointer text-muted-foreground">
                   {lineNames[key as keyof typeof lineNames].split('(')[0]}
