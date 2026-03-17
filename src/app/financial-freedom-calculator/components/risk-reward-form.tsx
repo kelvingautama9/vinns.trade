@@ -27,15 +27,29 @@ const parsePlainNumber = (value: string | number): number => {
 };
 
 const formSchema = z.object({
-  accountBalance: z.string().refine(val => parseCurrency(val, 'IDR') >= 0, {message: "Account Balance must be a positive number"}),
-  positionValue: z.string().refine(val => parseCurrency(val, 'IDR') > 0, {message: "Position Value must be a positive number"}),
-  entryPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Entry Price must be a positive number"}),
-  takeProfitPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Take Profit must be a positive number"}),
-  stopLossPrice: z.string().refine(val => parsePlainNumber(val) > 0, {message: "Stop Loss must be a positive number"}),
-}).refine(data => parsePlainNumber(data.entryPrice) > parsePlainNumber(data.stopLossPrice), {
+  accountBalance: z.string(),
+  positionValue: z.string(),
+  entryPrice: z.string().refine(val => parsePlainNumber(val) >= 0, {message: "Entry Price must be a positive number"}),
+  takeProfitPrice: z.string().refine(val => parsePlainNumber(val) >= 0, {message: "Take Profit must be a positive number"}),
+  stopLossPrice: z.string().refine(val => parsePlainNumber(val) >= 0, {message: "Stop Loss must be a positive number"}),
+}).refine(data => {
+    const entry = parsePlainNumber(data.entryPrice);
+    const sl = parsePlainNumber(data.stopLossPrice);
+    if (entry > 0 && sl > 0) {
+        return entry > sl;
+    }
+    return true;
+}, {
     message: "Stop Loss must be below Entry Price for a long trade.",
     path: ["stopLossPrice"],
-}).refine(data => parsePlainNumber(data.takeProfitPrice) > parsePlainNumber(data.entryPrice), {
+}).refine(data => {
+    const entry = parsePlainNumber(data.entryPrice);
+    const tp = parsePlainNumber(data.takeProfitPrice);
+     if (entry > 0 && tp > 0) {
+        return tp > entry;
+    }
+    return true;
+}, {
     message: "Take Profit must be above Entry Price for a long trade.",
     path: ["takeProfitPrice"],
 });
@@ -71,8 +85,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
   }
 
   const handleCurrencyInput = (field: "accountBalance" | "positionValue", value: string) => {
-    const numValue = parseCurrency(value, currency);
-    form.setValue(field, formatCurrency(numValue, currency), { shouldValidate: true });
+    form.setValue(field, value, { shouldValidate: true });
   };
   
   const handleNumberInput = (field: "entryPrice" | "takeProfitPrice" | "stopLossPrice", value: string) => {
@@ -80,18 +93,10 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
     form.setValue(field, numValue, { shouldValidate: true });
   }
 
-  useEffect(() => {
-    const values = form.getValues();
-    const oldCurrency = currency === 'IDR' ? 'USD' : 'IDR';
-    
-    const currentAccountBalance = parseCurrency(values.accountBalance, oldCurrency);
-    form.setValue('accountBalance', formatCurrency(currentAccountBalance, currency));
-
-    const currentPositionValue = parseCurrency(values.positionValue, oldCurrency);
-    form.setValue('positionValue', formatCurrency(currentPositionValue, currency));
-    
-  }, [currency, form]);
-
+  const handleBlur = (field: "accountBalance" | "positionValue") => (e: React.FocusEvent<HTMLInputElement>) => {
+    const numValue = parseCurrency(e.target.value, currency);
+    form.setValue(field, formatCurrency(numValue, currency), { shouldValidate: true });
+  };
 
   return (
     <Form {...form}>
@@ -128,7 +133,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <FormLabel>Account Balance</FormLabel>
                         <p className="text-xs text-muted-foreground -mt-1.5">The total capital in your trading account.</p>
                         <FormControl>
-                            <Input {...field} onChange={(e) => handleCurrencyInput("accountBalance", e.target.value)} onBlur={field.onBlur} />
+                            <Input {...field} onChange={(e) => handleCurrencyInput("accountBalance", e.target.value)} onBlur={handleBlur("accountBalance")} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -142,7 +147,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <FormLabel>Position Value</FormLabel>
                         <p className="text-xs text-muted-foreground -mt-1.5">The total nominal value of the asset you want to buy.</p>
                         <FormControl>
-                            <Input {...field} onChange={(e) => handleCurrencyInput("positionValue", e.target.value)} onBlur={field.onBlur} />
+                            <Input {...field} onChange={(e) => handleCurrencyInput("positionValue", e.target.value)} onBlur={handleBlur("positionValue")} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -156,7 +161,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <FormLabel>Entry Price (EP)</FormLabel>
                         <p className="text-xs text-muted-foreground -mt-1.5">The price at which you plan to open your position.</p>
                         <FormControl>
-                            <Input type="text" {...field} onChange={(e) => handleNumberInput("entryPrice", e.target.value)} onBlur={field.onBlur} />
+                            <Input type="text" {...field} onChange={(e) => handleNumberInput("entryPrice", e.target.value)} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -170,7 +175,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <FormLabel>Target Profit (TP)</FormLabel>
                         <p className="text-xs text-muted-foreground -mt-1.5">The price at which you plan to close for a profit.</p>
                         <FormControl>
-                            <Input type="text" {...field} onChange={(e) => handleNumberInput("takeProfitPrice", e.target.value)} onBlur={field.onBlur} />
+                            <Input type="text" {...field} onChange={(e) => handleNumberInput("takeProfitPrice", e.target.value)} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -184,7 +189,7 @@ export function RiskRewardForm({ onCalculate, isLoading, currency, setCurrency }
                         <FormLabel>Target Cut Loss (CL)</FormLabel>
                         <p className="text-xs text-muted-foreground -mt-1.5">The price at which you will exit to prevent further losses.</p>
                         <FormControl>
-                            <Input type="text" {...field} onChange={(e) => handleNumberInput("stopLossPrice", e.target.value)} onBlur={field.onBlur} />
+                            <Input type="text" {...field} onChange={(e) => handleNumberInput("stopLossPrice", e.target.value)} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

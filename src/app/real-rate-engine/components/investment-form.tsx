@@ -50,9 +50,9 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
     resolver: zodResolver(formSchema),
     defaultValues: {
       investmentType: 'withMonthly',
-      currentSavings: 'Rp 0',
-      monthlySavings: 'Rp 0',
-      targetAmount: 'Rp 0',
+      currentSavings: formatCurrency(0, 'IDR'),
+      monthlySavings: formatCurrency(0, 'IDR'),
+      targetAmount: formatCurrency(0, 'IDR'),
       expectedReturnRate: 0,
       inflationRate: 0,
       timeHorizonYears: 10,
@@ -83,9 +83,12 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
   }
 
   const handleRupiahChange = (field: "currentSavings" | "monthlySavings" | "targetAmount") => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const numberValue = parseCurrency(value, 'IDR');
-    form.setValue(field, formatCurrency(numberValue, 'IDR'));
+    form.setValue(field, e.target.value);
+  }
+
+  const handleRupiahBlur = (field: "currentSavings" | "monthlySavings" | "targetAmount") => (e: React.FocusEvent<HTMLInputElement>) => {
+    const numValue = parseCurrency(e.target.value, 'IDR');
+    form.setValue(field, formatCurrency(numValue, 'IDR'));
   }
 
   return (
@@ -133,7 +136,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     <FormItem>
                     <FormLabel>Initial Investment (Lump Sum)</FormLabel>
                     <FormControl>
-                        <Input {...field} onChange={handleRupiahChange("currentSavings")} onBlur={field.onBlur}/>
+                        <Input {...field} onChange={handleRupiahChange("currentSavings")} onBlur={handleRupiahBlur("currentSavings")}/>
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -146,7 +149,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     <FormItem>
                     <FormLabel>Monthly Savings</FormLabel>
                     <FormControl>
-                        <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={field.onBlur} disabled={investmentType === 'lumpSumOnly'} />
+                        <Input {...field} onChange={handleRupiahChange("monthlySavings")} onBlur={handleRupiahBlur("monthlySavings")} disabled={investmentType === 'lumpSumOnly'} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -159,7 +162,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
                     <FormItem>
                     <FormLabel>Financial Goal (Target)</FormLabel>
                     <FormControl>
-                        <Input {...field} onChange={handleRupiahChange("targetAmount")} onBlur={field.onBlur} />
+                        <Input {...field} onChange={handleRupiahChange("targetAmount")} onBlur={handleRupiahBlur("targetAmount")} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
