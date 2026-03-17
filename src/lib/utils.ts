@@ -29,27 +29,21 @@ export function formatCurrency(amount: number, currency: Currency): string {
     return new Intl.NumberFormat(locale, options).format(amount);
 }
   
-export function parseCurrency(formattedAmount: string): number {
+export function parseCurrency(formattedAmount: string, currency: Currency): number {
     if (!formattedAmount || typeof formattedAmount !== 'string') return 0;
-    
-    // Remove currency symbols and other non-numeric characters, but keep ',' and '.'
-    // This is a simplified approach. A more robust solution might be needed for i18n
-    const cleaned = formattedAmount.toString().replace(/[^0-9,.]/g, '');
 
-    const lastComma = cleaned.lastIndexOf(',');
-    const lastDot = cleaned.lastIndexOf('.');
+    let numericString: string;
 
-    let numberString;
-
-    // This logic handles both '1.234,56' (IDR) and '1,234.56' (USD) style formats
-    if (lastComma > lastDot) {
-        // Comma is the decimal separator, so remove dots and replace comma
-        numberString = cleaned.replace(/\./g, '').replace(',', '.');
-    } else {
-        // Dot is the decimal separator, so just remove commas
-        numberString = cleaned.replace(/,/g, '');
+    if (currency === 'IDR') {
+        // For IDR, dots are thousands separators, and there are no decimals by our formatter.
+        // We just need to remove non-digit characters.
+        numericString = formattedAmount.replace(/[^0-9]/g, '');
+    } else { // USD
+        // For USD, remove commas, but keep the dot. This assumes a single dot is the decimal separator.
+        // This won't handle international formats well, but is fine for `en-US` locale.
+        numericString = formattedAmount.replace(/,/g, '');
     }
     
-    const parsed = parseFloat(numberString);
+    const parsed = parseFloat(numericString);
     return isNaN(parsed) ? 0 : parsed;
 }

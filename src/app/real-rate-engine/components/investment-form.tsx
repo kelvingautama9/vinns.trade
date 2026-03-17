@@ -22,16 +22,16 @@ import { cn, formatCurrency, parseCurrency } from '@/lib/utils';
 
 const formSchema = z.object({
   investmentType: z.enum(['withMonthly', 'lumpSumOnly']),
-  currentSavings: z.string().refine(val => parseCurrency(val) >= 0, {message: "Must be a positive number"}),
+  currentSavings: z.string().refine(val => parseCurrency(val, 'IDR') >= 0, {message: "Must be a positive number"}),
   monthlySavings: z.string(),
-  targetAmount: z.string().refine(val => parseCurrency(val) >= 0, {message: "Must be a positive number"}),
+  targetAmount: z.string().refine(val => parseCurrency(val, 'IDR') >= 0, {message: "Must be a positive number"}),
   expectedReturnRate: z.coerce.number().min(0).max(100),
   inflationRate: z.coerce.number().min(0).max(100),
   timeHorizonYears: z.coerce.number().min(1).max(100),
   annuityType: z.enum(['ordinary', 'due']),
 }).refine(data => {
     if (data.investmentType === 'withMonthly') {
-        return parseCurrency(data.monthlySavings) >= 0;
+        return parseCurrency(data.monthlySavings, 'IDR') >= 0;
     }
     return true;
 }, {
@@ -69,12 +69,12 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
   }, [investmentType, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const monthlySavingsValue = values.investmentType === 'lumpSumOnly' ? 0 : parseCurrency(values.monthlySavings);
+    const monthlySavingsValue = values.investmentType === 'lumpSumOnly' ? 0 : parseCurrency(values.monthlySavings, 'IDR');
     
     onCalculate({
-        currentSavings: parseCurrency(values.currentSavings),
+        currentSavings: parseCurrency(values.currentSavings, 'IDR'),
         monthlySavings: monthlySavingsValue,
-        targetAmount: parseCurrency(values.targetAmount),
+        targetAmount: parseCurrency(values.targetAmount, 'IDR'),
         expectedReturnRate: values.expectedReturnRate,
         inflationRate: values.inflationRate,
         timeHorizonYears: values.timeHorizonYears,
@@ -84,7 +84,7 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
 
   const handleRupiahChange = (field: "currentSavings" | "monthlySavings" | "targetAmount") => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const numberValue = parseCurrency(value);
+    const numberValue = parseCurrency(value, 'IDR');
     form.setValue(field, formatCurrency(numberValue, 'IDR'));
   }
 
