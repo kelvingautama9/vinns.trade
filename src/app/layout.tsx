@@ -8,8 +8,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  title: 'Vinns Trade',
-  description: 'Modern Investment Tools for the Modern Investor',
+  title: "Kelvin's Trading Diary",
+  description: 'A personal space to share modern investment tools and insights for the modern investor.',
 };
 
 export default function RootLayout({
