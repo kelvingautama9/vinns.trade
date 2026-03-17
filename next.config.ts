@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   output: 'export',
   // basePath dan assetPrefix diperlukan agar file dapat ditemukan di GitHub Pages.
   basePath: isProd ? `/${repositoryName}` : "",
-  // assetPrefix harus diakhiri dengan garis miring.
   assetPrefix: isProd ? `/${repositoryName}/` : "",
   images: {
     unoptimized: true,
