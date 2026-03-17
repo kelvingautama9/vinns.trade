@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatRupiah, cn } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { Frown, Info, Sparkles, Star, Target, TrendingUp, Zap, HelpCircle, ShieldCheck, Rabbit, Turtle } from 'lucide-react';
 import { GrowthChart } from './growth-chart';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -72,7 +72,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
   return (
     <div className="space-y-6">
       {!isTargetMet && (
-        <Alert variant="destructive" className="border-destructive/50 bg-destructive/10 text-destructive backdrop-blur-lg">
+        <Alert variant="destructive" className="border-destructive/50 bg-destructive/20 text-destructive-foreground backdrop-blur-lg">
           <Frown className="h-4 w-4" />
           <AlertTitle>Strategy Needs Adjustment</AlertTitle>
           <AlertDescription>
@@ -82,7 +82,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
       )}
 
       {isTargetMet && (
-         <Alert className="border-success/50 bg-success/10 text-success backdrop-blur-lg">
+         <Alert className="border-success/50 bg-success/20 text-success-foreground backdrop-blur-lg">
           <Sparkles className="h-4 w-4" />
           <AlertTitle>Congratulations!</AlertTitle>
           <AlertDescription>
@@ -105,27 +105,27 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 text-center md:grid-cols-2">
-                 <div className="rounded-lg bg-white/5 p-4">
+                 <div className="rounded-lg bg-card/50 p-4">
                     <p className="text-sm text-muted-foreground">Your Goal</p>
-                    <p className="text-2xl font-bold">{formatRupiah(targetAmount)}</p>
+                    <p className="text-2xl font-bold">{formatCurrency(targetAmount, 'IDR')}</p>
                 </div>
-                 <div className="rounded-lg bg-white/5 p-4">
+                 <div className="rounded-lg bg-card/50 p-4">
                     <p className="text-sm text-muted-foreground">Projected Value</p>
                     <p className={cn(
                         "text-2xl font-bold",
                         isTargetMet ? "text-success" : "text-destructive"
-                    )}>{formatRupiah(finalNominalValue)}</p>
+                    )}>{formatCurrency(finalNominalValue, 'IDR')}</p>
                 </div>
             </div>
             {!isTargetMet && shortfall > 0 && (
                 <div className="text-center font-medium text-destructive">
-                    You are short by {formatRupiah(shortfall)}
+                    You are short by {formatCurrency(shortfall, 'IDR')}
                 </div>
             )}
             <div className="space-y-2 pt-2">
                 <div className="flex justify-between text-sm font-medium text-muted-foreground">
-                    <span>Principal: {formatRupiah(totalInvestment)} ({principalPercentage.toFixed(0)}%)</span>
-                    <span>Interest: {formatRupiah(totalInterest)} ({interestPercentage.toFixed(0)}%)</span>
+                    <span>Principal: {formatCurrency(totalInvestment, 'IDR')} ({principalPercentage.toFixed(0)}%)</span>
+                    <span>Interest: {formatCurrency(totalInterest, 'IDR')} ({interestPercentage.toFixed(0)}%)</span>
                 </div>
                 <Progress value={principalPercentage} className="h-2" />
             </div>
@@ -180,7 +180,7 @@ export function ResultsDisplay({ result, isLoading }: ResultsDisplayProps) {
                     {recommendations.map(rec => (
                         <TabsContent key={rec.type} value={rec.type} className="prose prose-sm dark:prose-invert mt-4 max-w-none p-2 text-center">
                             {rec.type === 'increaseMonthlySavings' && (
-                                <p>To reach your goal with your current timeline and return rate, you could increase your monthly savings to <strong className="text-primary">{formatRupiah(rec.value)}</strong>. This adjustment targets your goal of {formatRupiah(targetAmount)}.</p>
+                                <p>To reach your goal with your current timeline and return rate, you could increase your monthly savings to <strong className="text-primary">{formatCurrency(rec.value, 'IDR')}</strong>. This adjustment targets your goal of {formatCurrency(targetAmount, 'IDR')}.</p>
                             )}
                              {rec.type === 'extendTimeHorizon' && (
                                 realRateIsNegative ? (

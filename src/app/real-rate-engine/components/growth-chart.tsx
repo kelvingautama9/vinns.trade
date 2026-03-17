@@ -11,7 +11,7 @@ import {
   Legend,
   CartesianGrid,
 } from 'recharts';
-import { formatRupiah } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 
 type GrowthChartProps = {
   data: ChartDataPoint[];
@@ -66,7 +66,7 @@ export function GrowthChart({ data, visibleLines }: GrowthChartProps) {
               borderColor: 'hsl(var(--border))',
               borderRadius: 'var(--radius)',
             }}
-            formatter={(value, name) => [formatRupiah(value as number), lineNames[name as string] || name]}
+            formatter={(value, name) => [formatCurrency(value as number, 'IDR'), lineNames[name as string] || name]}
           />
           <Legend wrapperStyle={{ fontSize: '14px' }} />
           {Object.entries(visibleLines).map(([key, visible]) => (

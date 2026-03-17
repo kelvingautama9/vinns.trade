@@ -18,20 +18,20 @@ import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import type { InvestmentInput } from '@/types';
 import { Loader2 } from 'lucide-react';
-import { cn, formatRupiah, parseRupiah } from '@/lib/utils';
+import { cn, formatCurrency, parseCurrency } from '@/lib/utils';
 
 const formSchema = z.object({
   investmentType: z.enum(['withMonthly', 'lumpSumOnly']),
-  currentSavings: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
+  currentSavings: z.string().refine(val => parseCurrency(val) >= 0, {message: "Must be a positive number"}),
   monthlySavings: z.string(),
-  targetAmount: z.string().refine(val => parseRupiah(val) >= 0, {message: "Must be a positive number"}),
+  targetAmount: z.string().refine(val => parseCurrency(val) >= 0, {message: "Must be a positive number"}),
   expectedReturnRate: z.coerce.number().min(0).max(100),
   inflationRate: z.coerce.number().min(0).max(100),
   timeHorizonYears: z.coerce.number().min(1).max(100),
   annuityType: z.enum(['ordinary', 'due']),
 }).refine(data => {
     if (data.investmentType === 'withMonthly') {
-        return parseRupiah(data.monthlySavings) >= 0;
+        return parseCurrency(data.monthlySavings) >= 0;
     }
     return true;
 }, {
@@ -64,17 +64,17 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
 
   useEffect(() => {
     if (investmentType === 'lumpSumOnly') {
-      form.setValue('monthlySavings', formatRupiah(0));
+      form.setValue('monthlySavings', formatCurrency(0, 'IDR'));
     }
   }, [investmentType, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const monthlySavingsValue = values.investmentType === 'lumpSumOnly' ? 0 : parseRupiah(values.monthlySavings);
+    const monthlySavingsValue = values.investmentType === 'lumpSumOnly' ? 0 : parseCurrency(values.monthlySavings);
     
     onCalculate({
-        currentSavings: parseRupiah(values.currentSavings),
+        currentSavings: parseCurrency(values.currentSavings),
         monthlySavings: monthlySavingsValue,
-        targetAmount: parseRupiah(values.targetAmount),
+        targetAmount: parseCurrency(values.targetAmount),
         expectedReturnRate: values.expectedReturnRate,
         inflationRate: values.inflationRate,
         timeHorizonYears: values.timeHorizonYears,
@@ -84,8 +84,8 @@ export function InvestmentForm({ onCalculate, isLoading }: InvestmentFormProps) 
 
   const handleRupiahChange = (field: "currentSavings" | "monthlySavings" | "targetAmount") => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const numberValue = parseRupiah(value);
-    form.setValue(field, formatRupiah(numberValue));
+    const numberValue = parseCurrency(value);
+    form.setValue(field, formatCurrency(numberValue, 'IDR'));
   }
 
   return (

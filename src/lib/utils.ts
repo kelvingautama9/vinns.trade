@@ -1,6 +1,6 @@
-import { type Currency } from '@/types';
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { type Currency } from '@/types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -23,13 +23,17 @@ export function formatCurrency(amount: number, currency: Currency): string {
     }
     
     const locale = currency === 'IDR' ? 'id-ID' : 'en-US';
+    
+    // In the browser, this will work as expected.
+    // In Node.js (during SSR), you might need to ensure the full ICU data is available.
     return new Intl.NumberFormat(locale, options).format(amount);
 }
   
 export function parseCurrency(formattedAmount: string): number {
     if (!formattedAmount || typeof formattedAmount !== 'string') return 0;
     
-    // Remove currency symbols and non-digit characters except for comma and period
+    // Remove currency symbols and other non-numeric characters, but keep ',' and '.'
+    // This is a simplified approach. A more robust solution might be needed for i18n
     const cleaned = formattedAmount.toString().replace(/[^0-9,.]/g, '');
 
     const lastComma = cleaned.lastIndexOf(',');
@@ -37,13 +41,12 @@ export function parseCurrency(formattedAmount: string): number {
 
     let numberString;
 
-    // Determine if comma is decimal separator (e.g., European style like IDR)
+    // This logic handles both '1.234,56' (IDR) and '1,234.56' (USD) style formats
     if (lastComma > lastDot) {
-        // Replace all dots (thousands separators) and change comma to dot (decimal)
+        // Comma is the decimal separator, so remove dots and replace comma
         numberString = cleaned.replace(/\./g, '').replace(',', '.');
     } else {
-        // Assume dot is decimal separator (e.g., US style)
-        // Remove all commas (thousands separators)
+        // Dot is the decimal separator, so just remove commas
         numberString = cleaned.replace(/,/g, '');
     }
     
