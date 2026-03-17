@@ -4,7 +4,9 @@ import type {
     CalculationResult, 
     Recommendation,
     PositionSizingInput,
-    PositionSizingResult
+    PositionSizingResult,
+    ScenarioResult,
+    DrawdownResult
 } from '@/types';
 
 // --- Investment Growth Calculation ---
@@ -180,47 +182,69 @@ export function calculatePositionSizing(
   input: PositionSizingInput
 ): PositionSizingResult {
   const {
-    totalCapital,
-    riskPerTrade, // This is a percentage, e.g., 1 for 1%
+    margin,
     entryPrice,
     stopLossPrice,
     takeProfitPrice,
+    maxRiskNominal,
   } = input;
 
-  // 1. RISK PER UNIT
-  const riskPerUnit = entryPrice - stopLossPrice;
-  if (riskPerUnit <= 0) {
-    throw new Error("Stop Loss Price must be lower than Entry Price.");
+  if (maxRiskNominal <= 0) {
+      throw new Error("Max Risk must be greater than 0.");
   }
 
-  // 2. REWARD PER UNIT
-  const rewardPerUnit = takeProfitPrice - entryPrice;
-  if (rewardPerUnit <= 0) {
-     throw new Error("Take Profit Price must be higher than Entry Price.");
+  // 1. Calculate distances
+  const tpDistance = Math.abs(takeProfitPrice - entryPrice);
+  const clDistance = Math.abs(entryPrice - stopLossPrice);
+
+  if (clDistance <= 0) {
+    throw new Error("Entry Price and Stop Loss Price must not be the same or have Stop Loss above Entry.");
+  }
+   if (tpDistance <= 0) {
+    throw new Error("Entry Price and Take Profit Price must not be the same or have Take Profit below Entry.");
   }
 
-  // 3. RISK-REWARD RATIO
-  const riskRewardRatio = rewardPerUnit / riskPerUnit;
 
-  // 4. POSITION SIZING
-  const totalRiskAmount = totalCapital * (riskPerTrade / 100);
-  const positionSize = totalRiskAmount / riskPerUnit;
-  const totalProfit = positionSize * rewardPerUnit;
+  // 2. Calculate RR Ratio
+  const rrRatio = tpDistance / clDistance;
 
-  // 5. RECOVERY FACTOR
-  const lossPercentage = riskPerTrade / 100;
-  const gainNeeded = (1 / (1 - lossPercentage)) - 1;
-  const recoveryFactor = gainNeeded * 100;
+  // 3. Calculate Position Size based on nominal risk
+  const positionSize = maxRiskNominal / clDistance;
 
-  // C. PSYCHOLOGICAL EDGE (Breakeven Win Rate)
-  const breakevenWinRate = (1 / (1 + riskRewardRatio)) * 100;
+  // 4. Calculate Potential Profit & Loss
+  const potentialProfit = positionSize * tpDistance;
+  const potentialLoss = positionSize * clDistance; // Should equal maxRiskNominal
+
+  // 5. Calculate Breakeven Win Rate for psychological context
+  const breakevenWinRate = (1 / (1 + rrRatio)) * 100;
+  
+  // 6. "The Series of 10 Trades" Simulation
+  const series40wr: ScenarioResult = {
+      netOutcome: (4 * potentialProfit) - (6 * maxRiskNominal)
+  };
+  const series50wr: ScenarioResult = {
+      netOutcome: (5 * potentialProfit) - (5 * maxRiskNominal)
+  };
+
+  // 7. Drawdown Simulation
+  const drawdownSeries: DrawdownResult[] = [3, 5, 10].map(trades => {
+      const lossAmount = trades * maxRiskNominal;
+      return {
+          trades,
+          lossAmount,
+          remainingCapital: margin - lossAmount
+      };
+  });
 
   return {
-    totalProfit,
-    totalRisk: totalRiskAmount,
-    riskRewardRatio,
+    rrRatio,
     positionSize,
+    potentialProfit,
+    potentialLoss,
     breakevenWinRate,
-    recoveryFactor,
+    series40wr,
+    series50wr,
+    drawdownSeries,
+    margin,
   };
 }

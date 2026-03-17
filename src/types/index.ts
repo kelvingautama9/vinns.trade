@@ -36,20 +36,34 @@ export type CalculationResult = {
   inflationRate: number;
 };
 
+export type Currency = 'IDR' | 'USD';
 
 export type PositionSizingInput = {
-    totalCapital: number;
-    riskPerTrade: number; // percentage, e.g. 1 for 1%
+    margin: number;
     entryPrice: number;
     stopLossPrice: number;
     takeProfitPrice: number;
+    maxRiskNominal: number;
+};
+
+export type ScenarioResult = {
+    netOutcome: number;
+};
+
+export type DrawdownResult = {
+    trades: number;
+    lossAmount: number;
+    remainingCapital: number;
 };
 
 export type PositionSizingResult = {
-    totalProfit: number;
-    totalRisk: number;
-    riskRewardRatio: number;
+    rrRatio: number;
     positionSize: number;
-    breakevenWinRate: number; // percentage
-    recoveryFactor: number; // percentage
+    potentialProfit: number;
+    potentialLoss: number;
+    breakevenWinRate: number;
+    series40wr: ScenarioResult;
+    series50wr: ScenarioResult;
+    drawdownSeries: DrawdownResult[];
+    margin: number;
 };
