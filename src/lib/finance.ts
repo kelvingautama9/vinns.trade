@@ -3,8 +3,8 @@ import type {
     InvestmentInput, 
     CalculationResult, 
     Recommendation,
-    RiskRewardInput,
-    RiskRewardResult
+    PositionSizingInput,
+    PositionSizingResult
 } from '@/types';
 
 // --- Investment Growth Calculation ---
@@ -174,48 +174,53 @@ export function calculateInvestmentGrowth(
 }
 
 
-// --- Risk-Reward Probability Calculation ---
+// --- Position Sizing & Risk Management Calculation ---
 
-export function calculateRiskRewardProbability(
-  input: RiskRewardInput
-): RiskRewardResult {
-    const { capital, riskPerTrade, winRate, riskRewardRatio } = input;
+export function calculatePositionSizing(
+  input: PositionSizingInput
+): PositionSizingResult {
+  const {
+    totalCapital,
+    riskPerTrade, // This is a percentage, e.g., 1 for 1%
+    entryPrice,
+    stopLossPrice,
+    takeProfitPrice,
+  } = input;
 
-    if (!capital || !riskPerTrade || !winRate || !riskRewardRatio) {
-        throw new Error("Invalid input: Capital, Risk per Trade, Win Rate, and R:R Ratio are required.");
-    }
-    
-    // Core Calculations
-    const riskAmount = capital * (riskPerTrade / 100);
-    const avgWin = riskAmount * riskRewardRatio;
-    
-    // Expectancy Formula
-    const Pw = winRate / 100;
-    const Pl = 1 - Pw;
-    const Al = riskAmount;
+  // 1. RISK PER UNIT
+  const riskPerUnit = entryPrice - stopLossPrice;
+  if (riskPerUnit <= 0) {
+    throw new Error("Stop Loss Price must be lower than Entry Price.");
+  }
 
-    const nominalExpectancy = (Pw * avgWin) - (Pl * Al);
-    const expectancyRatio = Al > 0 ? nominalExpectancy / Al : 0;
-    
-    let status: "POSITIVE EDGE / VALIDATED" | "NEGATIVE EDGE / HIGH RISK";
-    let message: string;
+  // 2. REWARD PER UNIT
+  const rewardPerUnit = takeProfitPrice - entryPrice;
+  if (rewardPerUnit <= 0) {
+     throw new Error("Take Profit Price must be higher than Entry Price.");
+  }
 
-    if (nominalExpectancy < 0) {
-        status = "NEGATIVE EDGE / HIGH RISK";
-        message = "This strategy is mathematically expected to lose money over a large number of trades. The system has a negative statistical edge.";
-    } else {
-        status = "POSITIVE EDGE / VALIDATED";
-        message = "The system has a positive statistical probability of profit over a large number of trades. The strategy appears viable.";
-    }
+  // 3. RISK-REWARD RATIO
+  const riskRewardRatio = rewardPerUnit / riskPerUnit;
 
-    return {
-        riskRewardRatio: riskRewardRatio,
-        nominalExpectancy,
-        expectancyRatio,
-        status,
-        message,
-        riskAmount,
-        avgWin: avgWin,
-        winRate
-    };
+  // 4. POSITION SIZING
+  const totalRiskAmount = totalCapital * (riskPerTrade / 100);
+  const positionSize = totalRiskAmount / riskPerUnit;
+  const totalProfit = positionSize * rewardPerUnit;
+
+  // 5. RECOVERY FACTOR
+  const lossPercentage = riskPerTrade / 100;
+  const gainNeeded = (1 / (1 - lossPercentage)) - 1;
+  const recoveryFactor = gainNeeded * 100;
+
+  // C. PSYCHOLOGICAL EDGE (Breakeven Win Rate)
+  const breakevenWinRate = (1 / (1 + riskRewardRatio)) * 100;
+
+  return {
+    totalProfit,
+    totalRisk: totalRiskAmount,
+    riskRewardRatio,
+    positionSize,
+    breakevenWinRate,
+    recoveryFactor,
+  };
 }

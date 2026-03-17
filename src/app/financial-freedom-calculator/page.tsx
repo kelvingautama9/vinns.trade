@@ -8,7 +8,7 @@ export default function TradingPlanPage() {
           Trading Plan
         </h1>
         <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-          Analyze the statistical viability of your trading strategy with the Risk-Reward Probability Engine.
+          Define your trade parameters to calculate position size and manage risk like a professional.
         </p>
       </div>
       <RiskRewardCalculator />

@@ -37,20 +37,19 @@ export type CalculationResult = {
 };
 
 
-export type RiskRewardInput = {
-    capital: number;
-    riskPerTrade: number;
-    winRate: number;
-    riskRewardRatio: number;
-}
+export type PositionSizingInput = {
+    totalCapital: number;
+    riskPerTrade: number; // percentage, e.g. 1 for 1%
+    entryPrice: number;
+    stopLossPrice: number;
+    takeProfitPrice: number;
+};
 
-export type RiskRewardResult = {
+export type PositionSizingResult = {
+    totalProfit: number;
+    totalRisk: number;
     riskRewardRatio: number;
-    nominalExpectancy: number;
-    expectancyRatio: number;
-    status: "POSITIVE EDGE / VALIDATED" | "NEGATIVE EDGE / HIGH RISK";
-    message: string;
-    riskAmount: number;
-    avgWin: number;
-    winRate: number;
-}
+    positionSize: number;
+    breakevenWinRate: number; // percentage
+    recoveryFactor: number; // percentage
+};

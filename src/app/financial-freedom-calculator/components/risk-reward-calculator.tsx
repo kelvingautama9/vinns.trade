@@ -1,27 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import type { RiskRewardInput, RiskRewardResult } from '@/types';
-import { calculateRiskRewardProbability } from '@/lib/finance';
+import type { PositionSizingInput, PositionSizingResult } from '@/types';
+import { calculatePositionSizing } from '@/lib/finance';
 import { Card } from '@/components/ui/card';
 import { RiskRewardForm } from './risk-reward-form';
 import { RiskRewardResults } from './risk-reward-results';
+import { useToast } from '@/hooks/use-toast';
 
 export function RiskRewardCalculator() {
-  const [result, setResult] = useState<RiskRewardResult | null>(null);
+  const [result, setResult] = useState<PositionSizingResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const handleCalculate = (data: RiskRewardInput) => {
+  const handleCalculate = (data: PositionSizingInput) => {
     setIsLoading(true);
     setResult(null);
 
     setTimeout(() => {
         try {
-            const resultData = calculateRiskRewardProbability(data);
+            const resultData = calculatePositionSizing(data);
             setResult(resultData);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            // Optionally, set an error state to show in the UI
+            toast({
+                variant: "destructive",
+                title: "Invalid Trade Parameters",
+                description: error.message || "Please check your inputs.",
+            })
         } finally {
             setIsLoading(false);
         }
