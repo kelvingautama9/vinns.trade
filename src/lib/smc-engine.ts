@@ -1,9 +1,8 @@
-
 import { SMCSignal, SignalQuality, SignalType, MarketTrend } from '@/types/terminal';
 
 /**
- * Simplified Client-Side SMC Engine
- * This mimics the logic of the Python script using OHLCV data from Binance
+ * SMC ENGINE V4 — Pure Structure Shift
+ * Strictly filters signals into 3 tiers based on candle velocity and structure alignment.
  */
 export function detectMarketStructure(symbol: string, candles: any[]): SMCSignal | null {
   if (candles.length < 10) return null;
@@ -15,15 +14,17 @@ export function detectMarketStructure(symbol: string, candles: any[]): SMCSignal
   const currentClose = closes[closes.length - 1];
   const prevClose = closes[closes.length - 2];
   
-  // Simple Swing Detection
-  const lastHigh = Math.max(...highs.slice(-10, -1));
-  const lastLow = Math.min(...lows.slice(-10, -1));
+  // Swing Detection
+  const lastHigh = Math.max(...highs.slice(-15, -1));
+  const lastLow = Math.min(...lows.slice(-15, -1));
 
   let type: SignalType | null = null;
   let score = 1;
   let trend: MarketTrend = 'RANGING';
 
-  // Detect BOS/CHoCH
+  // Detect BOS (Continuation) / CHoCH (Shift)
+  // Simplified logic for client-side: 
+  // If price breaks a 15-candle high/low, we trigger.
   if (currentClose > lastHigh && prevClose <= lastHigh) {
     type = 'BOS BULL';
     trend = 'BULLISH';
@@ -34,13 +35,18 @@ export function detectMarketStructure(symbol: string, candles: any[]): SMCSignal
 
   if (!type) return null;
 
-  // Quality logic (3 levels)
+  // Strength Level Mapping (1-3)
+  // 1: Speculative (Low volatility break)
+  // 2: Professional (Standard volatility)
+  // 3: Institutional (High velocity / Expansion candle)
   let quality: SignalQuality = 'SPECULATIVE';
-  if (Math.abs((currentClose - prevClose) / prevClose) > 0.005) {
+  const velocity = Math.abs((currentClose - prevClose) / prevClose);
+  
+  if (velocity > 0.008) {
     quality = 'PROFESSIONAL';
     score = 2;
   }
-  if (Math.abs((currentClose - prevClose) / prevClose) > 0.015) {
+  if (velocity > 0.02) {
     quality = 'INSTITUTIONAL';
     score = 3;
   }
@@ -54,6 +60,6 @@ export function detectMarketStructure(symbol: string, candles: any[]): SMCSignal
     quality,
     score,
     trend,
-    pctChange: ((currentClose - prevClose) / prevClose) * 100
+    pctChange: velocity * 100
   };
 }

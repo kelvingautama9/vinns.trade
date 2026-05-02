@@ -1,29 +1,28 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 220 30% 2%;
+    --background: 0 0% 1%;
     --foreground: 210 40% 98%;
-    --card: 220 30% 4%;
+    --card: 0 0% 2%;
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 142 70% 50%;
+    --primary: 142 100% 50%; /* Bloomberg Green */
     --primary-foreground: 144 80% 10%;
-    --secondary: 217 33% 15%;
+    --secondary: 0 0% 10%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 12%;
+    --muted: 0 0% 7%;
     --muted-foreground: 215 20% 65%;
-    --accent: 48 100% 50%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 84.2% 60.2%;
+    --accent: 45 100% 50%; /* Bloomberg Amber */
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 50%; /* Bloomberg Red */
     --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 18%;
-    --input: 217 33% 15%;
-    --ring: 142 70% 50%;
+    --border: 0 0% 15%;
+    --input: 0 0% 10%;
+    --ring: 142 100% 50%;
     --radius: 0px;
   }
 }
@@ -33,11 +32,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-mono;
+    @apply bg-background text-foreground font-mono antialiased;
     background-image: 
-      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
-      linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-    background-size: 100% 4px, 3px 100%;
+      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+      linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+    background-size: 100% 2px, 2px 100%;
     overflow-x: hidden;
   }
 }
@@ -48,7 +47,7 @@ body::after {
   display: block;
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: rgba(18, 16, 16, 0.03);
+  background: rgba(18, 16, 16, 0.01);
   opacity: 0;
   z-index: 9999;
   pointer-events: none;
@@ -56,8 +55,8 @@ body::after {
 }
 
 @keyframes flicker {
-  0% { opacity: 0.1; }
-  100% { opacity: 0.2; }
+  0% { opacity: 0.05; }
+  100% { opacity: 0.1; }
 }
 
 .terminal-grid {
@@ -74,6 +73,10 @@ body::after {
 .terminal-header {
   @apply bg-muted text-[10px] font-bold tracking-widest uppercase px-2 py-1 flex justify-between items-center border-b border-border;
   color: hsl(var(--accent));
+}
+
+.terminal-input {
+  @apply bg-black border border-border text-[11px] text-primary font-mono focus:border-accent outline-none px-2 py-1;
 }
 
 /* Custom Scrollbar */
