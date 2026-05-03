@@ -8,24 +8,23 @@
     --foreground: 0 0% 100%;
     --card: 0 0% 0%;
     --card-foreground: 0 0% 100%;
-    --popover: 0 0% 5%;
+    --popover: 0 0% 2%;
     --popover-foreground: 0 0% 100%;
-    --primary: 210 100% 50%; /* Bloomberg Blue */
+    --primary: 210 100% 50%; /* Bloomberg Blue #0088FF */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 10%;
+    --secondary: 0 0% 5%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 56%; /* Bloomberg Neutral */
-    --accent: 41 100% 50%; /* Bloomberg Amber */
+    --muted: 0 0% 8%;
+    --muted-foreground: 240 5% 58%; /* Bloomberg Neutral #8E8E93 */
+    --accent: 41 100% 50%; /* Bloomberg Amber #FFB000 */
     --accent-foreground: 0 0% 0%;
-    --destructive: 2 100% 60%; /* Bloomberg Red */
+    --destructive: 2 100% 60%; /* Bloomberg Red #FF3B30 */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 15%;
-    --input: 0 0% 8%;
+    --border: 240 5% 15%;
+    --input: 240 5% 10%;
     --ring: 41 100% 50%;
     --radius: 0px;
 
-    /* Custom Chart Colors */
     --chart-1: 210 100% 50%;
     --chart-2: 41 100% 50%;
     --chart-3: 0 0% 100%;
@@ -50,21 +49,21 @@ body::before {
   display: block;
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-              linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.005), rgba(0, 255, 0, 0.002), rgba(0, 0, 255, 0.005));
   background-size: 100% 2px, 2px 100%;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.1;
+  opacity: 0.15;
 }
 
 .terminal-header {
-  @apply bg-secondary text-[10px] font-bold tracking-widest uppercase px-2 py-1 flex justify-between items-center border-b border-border;
+  @apply bg-[#0A0A0A] text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 flex justify-between items-center border-b border-border;
   color: #FFB000;
 }
 
 .terminal-input {
-  @apply bg-black border border-border text-[11px] text-white font-mono focus:border-amber-500 outline-none px-2 py-1;
+  @apply bg-black border border-border text-[11px] text-white font-mono focus:border-[#FFB000] outline-none px-2 py-1.5 transition-all;
 }
 
 .terminal-card {
@@ -72,13 +71,18 @@ body::before {
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: #333; }
+::-webkit-scrollbar-thumb { background: #222; }
 ::-webkit-scrollbar-thumb:hover { background: #FFB000; }
 
 .recharts-default-tooltip {
   background-color: #000 !important;
   border: 1px solid #333 !important;
   border-radius: 0px !important;
+}
+
+/* TradingView Widget Theming Overrides */
+.tradingview-widget-container {
+    background-color: black !important;
 }
