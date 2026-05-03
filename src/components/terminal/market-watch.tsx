@@ -25,41 +25,56 @@ export function MarketWatch() {
       "showFloatingTooltip": false,
       "tabs": [
         {
-          "title": "TOTAL MARKET",
+          "title": "GLOBAL MARKET",
           "symbols": [
             { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
             { "s": "NASDAQ:NVDA", "d": "Nvidia" },
             { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
             { "s": "OANDA:XAUUSD", "d": "Gold" },
-            { "s": "OANDA:USDIDR", "d": "USD/IDR" }
+            { "s": "OANDA:USDIDR", "d": "USD/IDR" },
+            { "s": "NASDAQ:TSLA", "d": "Tesla" },
+            { "s": "BINANCE:ETHUSDT", "d": "Ethereum" }
           ]
         },
         {
-          "title": "INDICES",
-          "symbols": [
-            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
-            { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
-            { "s": "FOREXCOM:DJI", "d": "Dow Jones" },
-            { "s": "OANDA:XAUUSD", "d": "Gold" }
-          ]
-        },
-        {
-          "title": "US STOCKS",
+          "title": "TOP 10 STOCKS",
           "symbols": [
             { "s": "NASDAQ:NVDA", "d": "Nvidia" },
             { "s": "NASDAQ:AAPL", "d": "Apple" },
             { "s": "NASDAQ:MSFT", "d": "Microsoft" },
             { "s": "NASDAQ:GOOGL", "d": "Alphabet" },
+            { "s": "NASDAQ:AMZN", "d": "Amazon" },
+            { "s": "NASDAQ:META", "d": "Meta" },
             { "s": "NASDAQ:TSLA", "d": "Tesla" },
-            { "s": "NASDAQ:PLTR", "d": "Palantir" }
+            { "s": "NYSE:LLY", "d": "Eli Lilly" },
+            { "s": "NASDAQ:AVGO", "d": "Broadcom" },
+            { "s": "NYSE:BRK.B", "d": "Berkshire" }
           ]
         },
         {
-          "title": "CRYPTO",
+          "title": "TOP 10 CRYPTO",
           "symbols": [
             { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
             { "s": "BINANCE:ETHUSDT", "d": "Ethereum" },
-            { "s": "BINANCE:SOLUSDT", "d": "Solana" }
+            { "s": "BINANCE:SOLUSDT", "d": "Solana" },
+            { "s": "BINANCE:BNBUSDT", "d": "BNB" },
+            { "s": "BINANCE:XRPUSDT", "d": "XRP" },
+            { "s": "BINANCE:ADAUSDT", "d": "Cardano" },
+            { "s": "BINANCE:DOGEUSDT", "d": "Dogecoin" },
+            { "s": "BINANCE:AVAXUSDT", "d": "Avalanche" },
+            { "s": "BINANCE:DOTUSDT", "d": "Polkadot" },
+            { "s": "BINANCE:LINKUSDT", "d": "Chainlink" }
+          ]
+        },
+        {
+          "title": "INDICES / FX",
+          "symbols": [
+            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
+            { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
+            { "s": "OANDA:USDIDR", "d": "USD/IDR" },
+            { "s": "FX_IDC:EURIDR", "d": "EUR/IDR" },
+            { "s": "OANDA:XAUUSD", "d": "Gold" },
+            { "s": "TVC:DXY", "d": "US Dollar Index" }
           ]
         }
       ]
@@ -75,10 +90,10 @@ export function MarketWatch() {
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-black border-r border-border overflow-hidden">
+    <div className="flex flex-col h-full bg-black border-r border-border overflow-hidden transition-all duration-300">
       <div className="terminal-header">
-        <span>GLOBAL MONITOR (LIVE)</span>
-        <span className="text-[#8E8E93] text-[8px]">AUTO_REFRESH: ON</span>
+        <span>GLOBAL MONITOR (INSTITUTIONAL)</span>
+        <span className="text-[#8E8E93] text-[8px] animate-pulse">SYNC: ONLINE</span>
       </div>
       
       <div className="flex-1 tradingview-widget-container" ref={containerRef}>

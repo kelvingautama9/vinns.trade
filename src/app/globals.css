@@ -20,8 +20,8 @@
     --accent-foreground: 0 0% 0%;
     --destructive: 2 100% 60%; /* Bloomberg Red #FF3B30 */
     --destructive-foreground: 0 0% 100%;
-    --border: 240 5% 15%;
-    --input: 240 5% 10%;
+    --border: 240 5% 12%;
+    --input: 240 5% 8%;
     --ring: 41 100% 50%;
     --radius: 0px;
 
@@ -54,7 +54,7 @@ body::before {
   background-size: 100% 2px, 2px 100%;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 .terminal-header {
@@ -63,15 +63,15 @@ body::before {
 }
 
 .terminal-input {
-  @apply bg-black border border-border text-[11px] text-white font-mono focus:border-[#FFB000] outline-none px-2 py-1.5 transition-all;
+  @apply bg-black border border-border text-[11px] text-white font-mono focus:border-[#FFB000] outline-none px-2 py-1.5 transition-all duration-200;
 }
 
 .terminal-card {
-  @apply bg-black border border-border overflow-hidden;
+  @apply bg-black border border-border overflow-hidden transition-all duration-300;
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: #222; }
 ::-webkit-scrollbar-thumb:hover { background: #FFB000; }
@@ -85,4 +85,19 @@ body::before {
 /* TradingView Widget Theming Overrides */
 .tradingview-widget-container {
     background-color: black !important;
+    transition: all 0.3s ease;
+}
+
+/* Animations */
+.animate-in {
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
