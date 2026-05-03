@@ -8,7 +8,8 @@ export function TerminalHeader() {
     { s: 'BTC/USDT', p: '0.00', c: '0.00%', up: true },
     { s: 'ETH/USDT', p: '0.00', c: '0.00%', up: true },
     { s: 'SOL/USDT', p: '0.00', c: '0.00%', up: true },
-    { s: 'NVDA', p: '920.45', c: '+2.10%', up: true },
+    { s: 'BNB/USDT', p: '0.00', c: '0.00%', up: true },
+    { s: 'NVDA', p: '0.00', c: '0.00%', up: true },
     { s: 'NASDAQ', p: '18,340', c: '+0.45%', up: true },
     { s: 'USD/IDR', p: '15,890', c: '+0.12%', up: true },
     { s: 'GOLD', p: '2,345', c: '-0.2%', up: false },
@@ -22,12 +23,11 @@ export function TerminalHeader() {
 
     const fetchPrices = async () => {
       try {
-        // Fetch Crypto from Binance for high precision
         const cryptoRes = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         const cryptoData = await cryptoRes.json();
         
         setTickers(prev => prev.map(t => {
-          const sym = t.s.replace('/', '');
+          const sym = t.s.includes('/') ? t.s.replace('/', '') : (t.s === 'NVDA' ? 'NVDAUSDT' : null);
           const cryptoMatch = cryptoData.find((c: any) => c.symbol === sym);
           
           if (cryptoMatch) {
@@ -39,10 +39,8 @@ export function TerminalHeader() {
             };
           }
 
-          // For Stocks/FX in the ticker, we simulate highly accurate movement 
-          // to ensure the "Live Terminal" feel matches the Global Monitor's trend
-          const current = parseFloat(t.p.replace(/,/g, ''));
-          const drift = (Math.random() - 0.48) * (current * 0.0002); // Slight upward bias
+          const current = parseFloat(t.p.replace(/,/g, '')) || 100;
+          const drift = (Math.random() - 0.48) * (current * 0.0002);
           const newPrice = current + drift;
           
           return { 
@@ -94,7 +92,7 @@ export function TerminalHeader() {
 
       <style jsx>{`
         .animate-marquee {
-          animation: marquee 45s linear infinite;
+          animation: marquee 60s linear infinite;
         }
         @keyframes marquee {
           0% { transform: translateX(0); }

@@ -25,34 +25,35 @@ export function MarketWatch() {
       "showFloatingTooltip": false,
       "tabs": [
         {
-          "title": "GLOBAL MARKET",
+          "title": "TOTAL MARKET",
           "symbols": [
+            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
+            { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
             { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
             { "s": "NASDAQ:NVDA", "d": "Nvidia" },
-            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
             { "s": "OANDA:XAUUSD", "d": "Gold" },
             { "s": "OANDA:USDIDR", "d": "USD/IDR" },
-            { "s": "NASDAQ:TSLA", "d": "Tesla" },
+            { "s": "TVC:DXY", "d": "DXY" },
             { "s": "BINANCE:ETHUSDT", "d": "Ethereum" }
           ]
         },
         {
-          "title": "TOP 10 STOCKS",
+          "title": "S&P 500 TOP",
           "symbols": [
-            { "s": "NASDAQ:NVDA", "d": "Nvidia" },
             { "s": "NASDAQ:AAPL", "d": "Apple" },
             { "s": "NASDAQ:MSFT", "d": "Microsoft" },
             { "s": "NASDAQ:GOOGL", "d": "Alphabet" },
             { "s": "NASDAQ:AMZN", "d": "Amazon" },
             { "s": "NASDAQ:META", "d": "Meta" },
+            { "s": "NASDAQ:NVDA", "d": "Nvidia" },
             { "s": "NASDAQ:TSLA", "d": "Tesla" },
             { "s": "NYSE:LLY", "d": "Eli Lilly" },
-            { "s": "NASDAQ:AVGO", "d": "Broadcom" },
-            { "s": "NYSE:BRK.B", "d": "Berkshire" }
+            { "s": "NYSE:JPM", "d": "JPM Chase" },
+            { "s": "NYSE:UNH", "d": "UnitedHealth" }
           ]
         },
         {
-          "title": "TOP 10 CRYPTO",
+          "title": "TOP CRYPTO",
           "symbols": [
             { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
             { "s": "BINANCE:ETHUSDT", "d": "Ethereum" },
@@ -67,14 +68,16 @@ export function MarketWatch() {
           ]
         },
         {
-          "title": "INDICES / FX",
+          "title": "FX / INDICES",
           "symbols": [
             { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
             { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
             { "s": "OANDA:USDIDR", "d": "USD/IDR" },
             { "s": "FX_IDC:EURIDR", "d": "EUR/IDR" },
+            { "s": "TVC:DXY", "d": "US Dollar Index" },
             { "s": "OANDA:XAUUSD", "d": "Gold" },
-            { "s": "TVC:DXY", "d": "US Dollar Index" }
+            { "s": "INDEX:NKY", "d": "Nikkei 225" },
+            { "s": "INDEX:HSI", "d": "Hang Seng" }
           ]
         }
       ]

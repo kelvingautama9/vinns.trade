@@ -3,12 +3,35 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, PriceScaleMode, IChartApi, ISeriesApi } from 'lightweight-charts';
 
+// Expanded Symbols - Focused on top liquid assets on Binance
 const SYMBOLS = [
   { label: 'BTC/USDT', value: 'BTCUSDT' },
   { label: 'ETH/USDT', value: 'ETHUSDT' },
   { label: 'SOL/USDT', value: 'SOLUSDT' },
   { label: 'BNB/USDT', value: 'BNBUSDT' },
+  { label: 'XRP/USDT', value: 'XRPUSDT' },
   { label: 'ADA/USDT', value: 'ADAUSDT' },
+  { label: 'DOGE/USDT', value: 'DOGEUSDT' },
+  { label: 'AVAX/USDT', value: 'AVAXUSDT' },
+  { label: 'DOT/USDT', value: 'DOTUSDT' },
+  { label: 'LINK/USDT', value: 'LINKUSDT' },
+  { label: 'MATIC/USDT', value: 'MATICUSDT' },
+  { label: 'LTC/USDT', value: 'LTCUSDT' },
+  { label: 'BCH/USDT', value: 'BCHUSDT' },
+  { label: 'NEAR/USDT', value: 'NEARUSDT' },
+  { label: 'APT/USDT', value: 'APTUSDT' },
+  { label: 'ARB/USDT', value: 'ARBUSDT' },
+  { label: 'OP/USDT', value: 'OPUSDT' },
+  { label: 'SUI/USDT', value: 'SUIUSDT' },
+  { label: 'FET/USDT', value: 'FETUSDT' },
+  { label: 'RUNE/USDT', value: 'RUNEUSDT' },
+  { label: 'INJ/USDT', value: 'INJUSDT' },
+  { label: 'GRT/USDT', value: 'GRTUSDT' },
+  { label: 'AAVE/USDT', value: 'AAVEUSDT' },
+  { label: 'MKR/USDT', value: 'MKRUSDT' },
+  { label: 'SNX/USDT', value: 'SNXUSDT' },
+  { label: 'PENDLE/USDT', value: 'PENDLEUSDT' },
+  { label: 'GOLD (PAXG)', value: 'PAXGUSDT' },
 ];
 
 const TIMEFRAMES = [
@@ -31,7 +54,6 @@ export function LogChart() {
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    // 1. Initialize Chart
     const chart = createChart(chartContainerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: '#000000' },
@@ -70,7 +92,6 @@ export function LogChart() {
     chartRef.current = chart;
     seriesRef.current = candlestickSeries;
 
-    // 2. Fetch Historical Data
     const fetchHistory = async () => {
       try {
         const response = await fetch(
@@ -93,7 +114,6 @@ export function LogChart() {
 
     fetchHistory();
 
-    // 3. Setup Live Connection (WebSocket)
     const socket = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`);
     wsRef.current = socket;
 
@@ -111,7 +131,6 @@ export function LogChart() {
       }
     };
 
-    // 4. Handle Resize
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current) {
         chartRef.current.applyOptions({
@@ -154,7 +173,7 @@ export function LogChart() {
           <select 
             value={symbol}
             onChange={(e) => setSymbol(e.target.value)}
-            className="bg-black border border-border text-[9px] font-bold text-[#FFB000] outline-none px-2 py-1"
+            className="bg-black border border-border text-[9px] font-bold text-[#FFB000] outline-none px-2 py-1 max-w-[120px]"
           >
             {SYMBOLS.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
