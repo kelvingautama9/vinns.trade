@@ -8,8 +8,6 @@ export function MarketWatch() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Task 2: Official TradingView Market Overview Widget
-    // This provides categorized automatic updates for Stocks, Crypto, Indices
     const script = document.createElement('script');
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js";
     script.type = "text/javascript";
@@ -27,15 +25,23 @@ export function MarketWatch() {
       "showFloatingTooltip": false,
       "tabs": [
         {
+          "title": "TOTAL MARKET",
+          "symbols": [
+            { "s": "BINANCE:BTCUSDT", "d": "Bitcoin" },
+            { "s": "NASDAQ:NVDA", "d": "Nvidia" },
+            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
+            { "s": "OANDA:XAUUSD", "d": "Gold" },
+            { "s": "OANDA:USDIDR", "d": "USD/IDR" }
+          ]
+        },
+        {
           "title": "INDICES",
           "symbols": [
             { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
             { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
             { "s": "FOREXCOM:DJI", "d": "Dow Jones" },
-            { "s": "OANDA:XAUUSD", "d": "Gold" },
-            { "s": "OANDA:USDIDR", "d": "USD/IDR" }
-          ],
-          "originalTitle": "Indices"
+            { "s": "OANDA:XAUUSD", "d": "Gold" }
+          ]
         },
         {
           "title": "US STOCKS",
