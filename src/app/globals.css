@@ -4,26 +4,33 @@
 
 @layer base {
   :root {
-    --background: 0 0% 1%;
-    --foreground: 210 40% 98%;
-    --card: 0 0% 2%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 142 100% 50%; /* Bloomberg Green */
-    --primary-foreground: 144 80% 10%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 210 100% 50%; /* Bloomberg Blue */
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 10%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 0 0% 7%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 45 100% 50%; /* Bloomberg Amber */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 56%; /* Bloomberg Neutral */
+    --accent: 41 100% 50%; /* Bloomberg Amber */
     --accent-foreground: 0 0% 0%;
-    --destructive: 0 100% 50%; /* Bloomberg Red */
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 2 100% 60%; /* Bloomberg Red */
+    --destructive-foreground: 0 0% 100%;
     --border: 0 0% 15%;
-    --input: 0 0% 10%;
-    --ring: 142 100% 50%;
+    --input: 0 0% 8%;
+    --ring: 41 100% 50%;
     --radius: 0px;
+
+    /* Custom Chart Colors */
+    --chart-1: 210 100% 50%;
+    --chart-2: 41 100% 50%;
+    --chart-3: 0 0% 100%;
+    --chart-4: 142 100% 50%;
+    --chart-5: 2 100% 60%;
   }
 }
 
@@ -33,54 +40,45 @@
   }
   body {
     @apply bg-background text-foreground font-mono antialiased;
-    background-image: 
-      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-      linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
-    background-size: 100% 2px, 2px 100%;
-    overflow-x: hidden;
+    background-color: #000000;
   }
 }
 
-/* Bloomberg Terminal Scanline Animation */
-body::after {
+/* scanline effect */
+body::before {
   content: " ";
   display: block;
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: rgba(18, 16, 16, 0.01);
-  opacity: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+  background-size: 100% 2px, 2px 100%;
   z-index: 9999;
   pointer-events: none;
-  animation: flicker 0.15s infinite;
-}
-
-@keyframes flicker {
-  0% { opacity: 0.05; }
-  100% { opacity: 0.1; }
-}
-
-.terminal-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-gap: 1px;
-  background-color: hsl(var(--border));
-}
-
-.terminal-panel {
-  @apply bg-card p-2 flex flex-col overflow-hidden;
+  opacity: 0.1;
 }
 
 .terminal-header {
-  @apply bg-muted text-[10px] font-bold tracking-widest uppercase px-2 py-1 flex justify-between items-center border-b border-border;
-  color: hsl(var(--accent));
+  @apply bg-secondary text-[10px] font-bold tracking-widest uppercase px-2 py-1 flex justify-between items-center border-b border-border;
+  color: #FFB000;
 }
 
 .terminal-input {
-  @apply bg-black border border-border text-[11px] text-primary font-mono focus:border-accent outline-none px-2 py-1;
+  @apply bg-black border border-border text-[11px] text-white font-mono focus:border-amber-500 outline-none px-2 py-1;
+}
+
+.terminal-card {
+  @apply bg-black border border-border overflow-hidden;
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(var(--border)); }
-::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: #333; }
+::-webkit-scrollbar-thumb:hover { background: #FFB000; }
+
+.recharts-default-tooltip {
+  background-color: #000 !important;
+  border: 1px solid #333 !important;
+  border-radius: 0px !important;
+}
